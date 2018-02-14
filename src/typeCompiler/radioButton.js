@@ -1,4 +1,4 @@
-import omit from 'lodash/omit';
+import omit from "lodash/omit";
 
 /**
  * convert json value to expression text
@@ -8,11 +8,11 @@ import omit from 'lodash/omit';
  * @param obj
  * @returns {*}
  */
-const toExpression = (obj) => {
-  if (typeof obj === 'string') {
+const toExpression = obj => {
+  if (typeof obj === "string") {
     return `'${obj.replace(/'/gm, "\\'")}'`;
   }
-  if (typeof obj === 'number' || typeof obj === 'boolean') {
+  if (typeof obj === "number" || typeof obj === "boolean") {
     return `${obj}`;
   }
   // we don't support object in expression
@@ -34,26 +34,26 @@ const toExpression = (obj) => {
  * }
  */
 export default () => ({
-  before: (props) => {
-    const value = props['[value]'];
+  before: props => {
+    const value = props["[value]"];
     const selectedValueExpression = props.selectedValue
-      ? props['{selectedValue}']
+      ? props["{selectedValue}"]
       : toExpression(props.selectedValue);
 
     // omit values that don't need after compile
     const omittedProps = omit(props, [
-      '[value]',
-      'selectedValue',
-      '{selectedValue}',
+      "[value]",
+      "selectedValue",
+      "{selectedValue}"
     ]);
 
-    if (value && selectedValueExpression) {
-      return {
-        ...omittedProps,
-        '{isChecked}': `${value} is ${selectedValueExpression}`,
-        '(click)': `set('${value}', ${selectedValueExpression})`,
-      };
+    if (!value || !selectedValueExpression) {
+      return omittedProps;
     }
-    return omittedProps;
-  },
+    return {
+      ...omittedProps,
+      "{isChecked}": `${value} is ${selectedValueExpression}`,
+      "(click)": `set('${value}', ${selectedValueExpression})`
+    };
+  }
 });

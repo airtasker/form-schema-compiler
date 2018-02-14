@@ -1,10 +1,10 @@
-import { OPERATORS } from '../const';
-import apply from './apply';
+import { OPERATORS } from "../const";
+import apply from "./apply";
 
 const handleRegex = (left, operator, right) => {
   const regex = right instanceof RegExp ? right : new RegExp(right);
   if (left === undefined) {
-    return regex.test('');
+    return regex.test("");
   }
   return regex.test(left);
 };
@@ -41,7 +41,7 @@ export const evalBinaryExpression = ({ operator, left, right }) => {
       return left % right;
     default:
       throw new Error(
-        `unknown binary expression: ${{ operator, left, right }}`,
+        `unknown binary expression: ${{ operator, left, right }}`
       );
   }
 };
@@ -50,7 +50,7 @@ const applyBinaryExpression = ({ operator, left, right }, options) =>
   evalBinaryExpression({
     operator,
     left: apply(left, options),
-    right: apply(right, options),
+    right: apply(right, options)
   });
 
 export default applyBinaryExpression;

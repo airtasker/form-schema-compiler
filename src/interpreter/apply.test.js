@@ -1,4 +1,4 @@
-import { TYPES } from './../const';
+import { TYPES } from "./../const";
 import apply from "./apply";
 import { parseExpressionString } from "../parsers";
 

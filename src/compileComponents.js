@@ -1,16 +1,16 @@
-import curryRight from 'lodash/curryRight';
-import mapValues from 'lodash/mapValues';
-import mapKeys from 'lodash/mapKeys';
-import findKey from 'lodash/findKey';
-import flowRight from 'lodash/flowRight';
+import curryRight from "lodash/curryRight";
+import mapValues from "lodash/mapValues";
+import mapKeys from "lodash/mapKeys";
+import findKey from "lodash/findKey";
+import flowRight from "lodash/flowRight";
 
-import { ANNOTATION_TYPES, ANNOTATIONS, TYPES } from './const';
+import { ANNOTATION_TYPES, ANNOTATIONS, TYPES } from "./const";
 import {
   parseExpressionString,
   parseTemplateString,
-  parseDataBindingString,
-} from './parsers';
-import createTypeCompiler from './typeCompiler';
+  parseDataBindingString
+} from "./parsers";
+import createTypeCompiler from "./typeCompiler";
 
 /**
  * convert json value
@@ -22,33 +22,33 @@ import createTypeCompiler from './typeCompiler';
  * @param obj
  * @returns {*}
  */
-const toValueObject = (value) => {
+const toValueObject = value => {
   if (value === null) {
     return {
       type: TYPES.Null,
-      value,
+      value
     };
   }
   switch (typeof value) {
-    case 'string':
+    case "string":
       return {
         type: TYPES.String,
-        value,
+        value
       };
-    case 'number':
+    case "number":
       return {
         type: TYPES.Numeric,
-        value,
+        value
       };
-    case 'boolean':
+    case "boolean":
       return {
         type: TYPES.Boolean,
-        value,
+        value
       };
     default:
       return {
         type: TYPES.Raw,
-        value,
+        value
       };
   }
 };
@@ -64,7 +64,7 @@ const toValueObject = (value) => {
  * '{value}' return '{}'
  * '(value)' return '()'
  */
-const getAnnotationType = (key) =>
+const getAnnotationType = key =>
   findKey(ANNOTATIONS, { 0: key[0], 1: key[key.length - 1] });
 
 /**
@@ -143,33 +143,34 @@ export const compileProps = flowRight(compileKeys, compileValues);
 /**
  * Take component schema return AST,
  * examples see expression parsers and tests
- * @param type
- * @param props
+ * @param {*} componentSchema
+ * @param {{typeCompilers: *}} options
  * @returns {{type: *}}
  */
-const compileComponent = ({ type, ...props }) => {
-  const typeCompiler = createTypeCompiler(type);
+const compileComponent = ({ type, ...props }, { typeCompilers }) => {
+  const typeCompiler = createTypeCompiler(type, typeCompilers);
   const composed = flowRight(
     typeCompiler.after,
     compileProps,
-    typeCompiler.before,
+    typeCompiler.before
   );
   return {
     type,
-    ...composed(props),
+    ...composed(props)
   };
 };
 
 /**
- * compile components schema,
- * @param components if components is an object covert to [components]
+ * compile components schema
+ * @param {*} components if components is an object covert to [components]
+ * @param {{typeCompilers: *}} options
  * @returns {{type: string, components: Array}}
  */
-function compileComponents(components) {
+function compileComponents(components, options) {
   const componentArray = Array.isArray(components) ? components : [components];
   return {
     type: TYPES.Components,
-    components: componentArray.map(compileComponent),
+    components: componentArray.map(curryRight(compileComponent)(options))
   };
 }
 

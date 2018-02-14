@@ -13,15 +13,15 @@
  * }
  */
 export default () => ({
-  before: (props) => {
-    const value = props['[value]'];
+  before: props => {
+    const value = props["[value]"];
     if (value) {
       // add change handle if there is a data binding value
       return {
         ...props,
-        '(change)': `set('${value}', eventValue)`,
+        "(change)": `set('${value}', eventValue)`
       };
     }
     return props;
-  },
+  }
 });

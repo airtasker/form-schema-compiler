@@ -1,9 +1,9 @@
-import { TYPES } from '../const';
-import applyIdentifier from './applyIdentifier';
-import applyUnaryExpression from './applyUnaryExpression';
-import applyBinaryExpression from './applyBinaryExpression';
-import applyCallExpression from './applyCallExpression';
-import { hasKey } from '../utils';
+import { TYPES } from "../const";
+import applyIdentifier from "./applyIdentifier";
+import applyUnaryExpression from "./applyUnaryExpression";
+import applyBinaryExpression from "./applyBinaryExpression";
+import applyCallExpression from "./applyCallExpression";
+import { hasKey } from "../utils";
 
 const getValue = ({ value }) => value;
 const toRegExp = ({ pattern, flags }) => new RegExp(pattern, flags);
@@ -21,7 +21,7 @@ const TypeHandlers = {
   [TYPES.UnaryExpression]: applyUnaryExpression,
   [TYPES.BinaryExpression]: applyBinaryExpression,
   [TYPES.CallExpression]: applyCallExpression,
-  [TYPES.Components]: applyComponents,
+  [TYPES.Components]: applyComponents
 };
 
 /**
@@ -33,8 +33,8 @@ const TypeHandlers = {
  */
 const apply = ({ type, ...expression }, options = {}) => {
   if (
-    typeof options.variableGetter !== 'function' ||
-    typeof options.applyComponents !== 'function'
+    typeof options.variableGetter !== "function" ||
+    typeof options.applyComponents !== "function"
   ) {
     throw new Error(`Can't found variableGetter or applyComponents in options`);
   }

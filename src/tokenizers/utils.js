@@ -1,38 +1,38 @@
-import { BOOLEANS, OPERATORS, PUNCTUATIONS } from '../const';
+import { BOOLEANS, OPERATORS, PUNCTUATIONS } from "../const";
 
-export const isBoolean = (str) => BOOLEANS.includes(str);
+export const isBoolean = str => BOOLEANS.includes(str);
 
 const operatorStrings = Object.values(OPERATORS);
-export const isOperatorString = (str) => operatorStrings.includes(str);
+export const isOperatorString = str => operatorStrings.includes(str);
 
 const operatorChars = [
   OPERATORS.Add,
   OPERATORS.Subtract,
   OPERATORS.Multiply,
-  OPERATORS.Divide,
+  OPERATORS.Divide
 ];
-export const isOperatorChar = (ch) => operatorChars.includes(ch);
-export const isNull = (str) => str === 'null';
+export const isOperatorChar = ch => operatorChars.includes(ch);
+export const isNull = str => str === "null";
 
 const operatorStartChars = [OPERATORS.GreaterThan, OPERATORS.LessThan];
-export const isOperatorStart = (ch) => operatorStartChars.includes(ch);
+export const isOperatorStart = ch => operatorStartChars.includes(ch);
 
-const digitChars = '0123456789';
-export const isDigit = (ch) => digitChars.includes(ch);
+const digitChars = "0123456789";
+export const isDigit = ch => digitChars.includes(ch);
 
-export const isIdStart = (ch) => /[a-z_]/i.test(ch);
+export const isIdStart = ch => /[a-z_]/i.test(ch);
 
-export const isId = (ch) => isIdStart(ch) || isDigit(ch);
+export const isId = ch => isIdStart(ch) || isDigit(ch);
 
 const punctuationChars = [...PUNCTUATIONS.Parentheses, PUNCTUATIONS.Separator];
-export const isPunctuation = (ch) => punctuationChars.includes(ch);
+export const isPunctuation = ch => punctuationChars.includes(ch);
 
-export const isRegexpStart = (ch) => ch === '/';
+export const isRegexpStart = ch => ch === "/";
 
-export const isStringStart = (ch) => ch === "'" || ch === '"';
+export const isStringStart = ch => ch === "'" || ch === '"';
 
-const whitespaceChars = ' \t\n';
-export const isWhitespace = (ch) => whitespaceChars.includes(ch);
+const whitespaceChars = " \t\n";
+export const isWhitespace = ch => whitespaceChars.includes(ch);
 
 /**
  * concat input stream chunk until a failure predicate
@@ -41,7 +41,7 @@ export const isWhitespace = (ch) => whitespaceChars.includes(ch);
  * @returns {string}
  */
 export const readWhile = (inputStream, predicate) => {
-  let str = '';
+  let str = "";
   while (!inputStream.eof() && predicate(inputStream.peek()))
     str += inputStream.next();
   return str;
@@ -56,14 +56,14 @@ export const readWhile = (inputStream, predicate) => {
  */
 export const readEscaped = (inputStream, shouldStop) => {
   let escaped = false;
-  let str = '';
+  let str = "";
   inputStream.next();
   while (!inputStream.eof()) {
     const ch = inputStream.next();
     if (escaped) {
       str += ch;
       escaped = false;
-    } else if (ch === '\\') {
+    } else if (ch === "\\") {
       escaped = true;
     } else if (shouldStop(ch)) {
       break;
@@ -85,10 +85,10 @@ export const readEscaped = (inputStream, shouldStop) => {
 export const readWhileWithEscaped = (
   inputStream,
   shouldStop,
-  removeEscapeWhenEscaped = false,
+  removeEscapeWhenEscaped = false
 ) => {
   let escaped = false;
-  let str = '';
+  let str = "";
   while (!inputStream.eof()) {
     const ch = inputStream.next();
     const stop = shouldStop(ch);
@@ -105,7 +105,7 @@ export const readWhileWithEscaped = (
       break;
     }
     str += ch;
-    escaped = ch === '\\' && !escaped;
+    escaped = ch === "\\" && !escaped;
   }
   return str;
 };
@@ -151,6 +151,6 @@ export const createPeekAndNext = (nextFn, queueSize = 0) => {
   return {
     peek,
     next,
-    queue,
+    queue
   };
 };

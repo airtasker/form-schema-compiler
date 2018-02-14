@@ -3,7 +3,7 @@
  * @param input:string
  * @returns {{next: (function()), peek: (function(): string), eof: (function(): boolean), croak: (function(*)), position: (function(): {pos: number, line: number, col: number})}}
  */
-const createInputStream = (input) => {
+const createInputStream = input => {
   let pos = 0;
   let line = 1;
   let col = 0;
@@ -11,7 +11,7 @@ const createInputStream = (input) => {
   const next = () => {
     const ch = input.charAt(pos);
     pos += 1;
-    if (ch === '\n') {
+    if (ch === "\n") {
       line += 1;
       col = 0;
     } else {
@@ -22,16 +22,16 @@ const createInputStream = (input) => {
 
   const peek = () => input.charAt(pos);
 
-  const eof = () => peek() === '';
+  const eof = () => peek() === "";
 
-  const croak = (msg) => {
+  const croak = msg => {
     throw new Error(`${msg} (${line}:${col})`);
   };
 
   const position = () => ({
     pos,
     line,
-    col,
+    col
   });
 
   return {
@@ -39,7 +39,7 @@ const createInputStream = (input) => {
     peek,
     eof,
     croak,
-    position,
+    position
   };
 };
 

@@ -1,5 +1,5 @@
-import * as utils from './utils';
-import { BOOLEANS, TYPES } from '../const';
+import * as utils from "./utils";
+import { BOOLEANS, TYPES } from "../const";
 
 const defaultShouldEnd = () => false;
 
@@ -12,12 +12,12 @@ const defaultShouldEnd = () => false;
  */
 const createExpressionTokenStream = (
   inputStream,
-  shouldEnd = defaultShouldEnd,
+  shouldEnd = defaultShouldEnd
 ) => {
   const readNumber = () => {
     let hasDot = false;
-    const number = utils.readWhile(inputStream, (ch) => {
-      if (ch === '.') {
+    const number = utils.readWhile(inputStream, ch => {
+      if (ch === ".") {
         if (hasDot) {
           inputStream.croak(`Unexpected token:. , double dot in a number`);
         }
@@ -41,37 +41,37 @@ const createExpressionTokenStream = (
       // if identifier is  'true' or 'false' then it's a boolean
       return {
         type: TYPES.Boolean,
-        value: value === BOOLEANS[1],
+        value: value === BOOLEANS[1]
       };
     }
     if (utils.isOperatorString(value)) {
       // if identifier is 'is' 'isnt' 'not' 'match' then it's an operator
       return {
         type: TYPES.Operator,
-        value,
+        value
       };
     }
     if (utils.isNull(value)) {
       // if identifier is  'null' then it's a null
       return {
         type: TYPES.Null,
-        value: null,
+        value: null
       };
     }
 
     return {
       type: TYPES.Identifier,
-      name: value,
+      name: value
     };
   }
 
-  const validFlagChars = 'gimuy';
+  const validFlagChars = "gimuy";
   const readRegexp = () => {
     inputStream.next();
     // read regexp until see tne regexp ending char (/)
-    const pattern = utils.readWhileWithEscaped(inputStream, (ch) => ch === '/');
+    const pattern = utils.readWhileWithEscaped(inputStream, ch => ch === "/");
 
-    let flags = '';
+    let flags = "";
     while (!inputStream.eof()) {
       const ch = inputStream.peek();
       if (validFlagChars.includes(ch) && !flags.includes(ch)) {
@@ -83,7 +83,7 @@ const createExpressionTokenStream = (
         break;
       } else {
         inputStream.croak(
-          `Uncaught SyntaxError: Invalid regular expression flags: "${flags}${ch}"`,
+          `Uncaught SyntaxError: Invalid regular expression flags: "${flags}${ch}"`
         );
       }
     }
@@ -91,29 +91,29 @@ const createExpressionTokenStream = (
     return {
       type: TYPES.RegExp,
       pattern,
-      flags,
+      flags
     };
   };
 
   const readString = () => ({
     type: TYPES.String,
-    value: utils.readEscaped(inputStream, utils.isStringStart),
+    value: utils.readEscaped(inputStream, utils.isStringStart)
   });
 
   const readOperator = () => {
     let value = inputStream.next();
-    if (inputStream.peek() === '=') {
+    if (inputStream.peek() === "=") {
       value += inputStream.next();
     }
     return {
       type: TYPES.Operator,
-      value,
+      value
     };
   };
 
   const skipComment = () => {
     inputStream.next();
-    utils.readWhile(inputStream, (ch) => ch !== '\n' && ch !== '#');
+    utils.readWhile(inputStream, ch => ch !== "\n" && ch !== "#");
     inputStream.next();
   };
 
@@ -123,7 +123,7 @@ const createExpressionTokenStream = (
   const notRegexpPreviousTypes = [
     TYPES.Numeric,
     TYPES.String,
-    TYPES.Identifier,
+    TYPES.Identifier
   ];
 
   // check previous token if read /
@@ -139,7 +139,7 @@ const createExpressionTokenStream = (
     if (inputStream.eof() || shouldEnd(ch)) {
       return null;
     }
-    if (ch === '#') {
+    if (ch === "#") {
       skipComment();
       return readNext();
     }
@@ -162,13 +162,13 @@ const createExpressionTokenStream = (
     if (utils.isPunctuation(ch)) {
       return {
         type: TYPES.Punctuation,
-        value: inputStream.next(),
+        value: inputStream.next()
       };
     }
     if (utils.isOperatorChar(ch)) {
       return {
         type: TYPES.Operator,
-        value: inputStream.next(),
+        value: inputStream.next()
       };
     }
     inputStream.croak(`Can't handle character: ${ch}`);
@@ -180,7 +180,7 @@ const createExpressionTokenStream = (
     ...inputStream,
     next,
     peek,
-    eof,
+    eof
   };
 };
 

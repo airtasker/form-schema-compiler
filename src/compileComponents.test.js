@@ -1,131 +1,131 @@
-import compileComponents, {compileProps} from './compileComponents';
-import { TYPES } from './const';
+import compileComponents, { compileProps } from "./compileComponents";
+import { TYPES } from "./const";
 
-describe('compileComponents', () => {
-  it('Should always wrapped with in components', () => {
+describe("compileComponents", () => {
+  it("Should always wrapped with in components", () => {
     expect(
       compileComponents({
-        type: 'Hello',
-      }),
+        type: "Hello"
+      })
     ).toEqual({
       type: TYPES.Components,
       components: [
         {
-          type: 'Hello',
-        },
-      ],
+          type: "Hello"
+        }
+      ]
     });
   });
 
-  it('Should compile nested components', () => {
+  it("Should compile nested components", () => {
     expect(
       compileComponents({
-        type: 'Parent',
-        '<children>': {
-          type: 'Children',
-          '<grandChildren>': [
+        type: "Parent",
+        "<children>": {
+          type: "Children",
+          "<grandChildren>": [
             {
-              type: 'GrandChild1',
+              type: "GrandChild1"
             },
             {
-              type: 'GrandChild2',
-            },
-          ],
-        },
-      }),
+              type: "GrandChild2"
+            }
+          ]
+        }
+      })
     ).toEqual({
       type: TYPES.Components,
       components: [
         {
-          type: 'Parent',
+          type: "Parent",
           children: {
             type: TYPES.Components,
             components: [
               {
-                type: 'Children',
+                type: "Children",
                 grandChildren: {
                   type: TYPES.Components,
                   components: [
                     {
-                      type: 'GrandChild1',
+                      type: "GrandChild1"
                     },
                     {
-                      type: 'GrandChild2',
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      ],
+                      type: "GrandChild2"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
     });
   });
 
-  describe('compileProps', () => {
-    it('Should compile normal props', () => {
+  describe("compileProps", () => {
+    it("Should compile normal props", () => {
       expect(
         compileProps({
-          a: '',
+          a: "",
           b: null,
           c: 1,
           d: true,
           e: [],
-          f: {},
-        }),
+          f: {}
+        })
       ).toEqual({
         a: {
           type: TYPES.String,
-          value: '',
+          value: ""
         },
         b: {
           type: TYPES.Null,
-          value: null,
+          value: null
         },
         c: {
           type: TYPES.Numeric,
-          value: 1,
+          value: 1
         },
         d: {
           type: TYPES.Boolean,
-          value: true,
+          value: true
         },
         e: {
           type: TYPES.Raw,
-          value: [],
+          value: []
         },
         f: {
           type: TYPES.Raw,
-          value: {},
+          value: {}
         }
       });
     });
 
-    it('Should compile expression props', () => {
+    it("Should compile expression props", () => {
       expect(
         compileProps({
-          '[dataBinding]': 'a',
-          '{exp}': 'b',
-          '(action)': 'c',
-          '#template#': 'a+d',
-        }),
+          "[dataBinding]": "a",
+          "{exp}": "b",
+          "(action)": "c",
+          "#template#": "a+d"
+        })
       ).toEqual({
         dataBinding: {
           type: TYPES.Identifier,
-          name: 'a',
+          name: "a"
         },
         exp: {
           type: TYPES.Identifier,
-          name: 'b',
+          name: "b"
         },
         onAction: {
           type: TYPES.Identifier,
-          name: 'c',
+          name: "c"
         },
         template: {
           type: TYPES.String,
-          value: 'a+d',
-        },
+          value: "a+d"
+        }
       });
     });
   });

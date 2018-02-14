@@ -1,7 +1,7 @@
-import defaultTo from 'lodash/defaultTo';
-import noop from 'lodash/noop';
-import TextInput from './textInput';
-import RadioButton from './radioButton';
+import defaultTo from "lodash/defaultTo";
+import noop from "lodash/noop";
+import TextInput from "./textInput";
+import RadioButton from "./radioButton";
 
 /**
  * add type compiler here,
@@ -21,18 +21,27 @@ const TYPE_COMPILERS = { TextInput, TextArea: TextInput, RadioButton };
 
 // default dummy type compiler
 const defaultTypeCompiler = {
-  before: (r) => r,
-  after: (r) => r,
+  before: r => r,
+  after: r => r
 };
 
 /**
  * Add specific type handle for components.
- * @param type
+ * @param {string} type 
+ * @param {object} customTypeCompilers 
+ * @param {object} defaultTypeCompilers 
  */
-const createTypeCompiler = (type, typeCompilers = TYPE_COMPILERS) => ({
+const createTypeCompiler = (
+  type,
+  customTypeCompilers = {},
+  defaultTypeCompilers = TYPE_COMPILERS,
+) => ({
   // apply default compiler
   ...defaultTypeCompiler,
-  ...defaultTo(typeCompilers[type], noop)(),
+  ...defaultTo(
+    defaultTo(customTypeCompilers[type], defaultTypeCompilers[type]),
+    noop
+  )()
 });
 
 export default createTypeCompiler;
