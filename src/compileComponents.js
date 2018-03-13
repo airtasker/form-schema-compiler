@@ -166,7 +166,7 @@ const compileComponent = ({ type, ...props }, { typeCompilers }) => {
  * @param {{typeCompilers: *}} options
  * @returns {{type: string, components: Array}}
  */
-function compileComponents(components, options) {
+function compileComponents(components, options = {}) {
   const componentArray = Array.isArray(components) ? components : [components];
   return {
     type: TYPES.Components,
