@@ -1,5 +1,5 @@
 {
-  "name": "form-schema-compiler",
+  "name": "@airtasker/form-schema-compiler",
   "version": "0.0.3",
   "description": "a form schema compiler",
   "main": "./lib/index.js",
