@@ -27,14 +27,14 @@ const defaultTypeCompiler = {
 
 /**
  * Add specific type handle for components.
- * @param {string} type 
- * @param {object} customTypeCompilers 
- * @param {object} defaultTypeCompilers 
+ * @param {string} type
+ * @param {object} customTypeCompilers
+ * @param {object} defaultTypeCompilers
  */
 const createTypeCompiler = (
   type,
   customTypeCompilers = {},
-  defaultTypeCompilers = TYPE_COMPILERS,
+  defaultTypeCompilers = TYPE_COMPILERS
 ) => ({
   // apply default compiler
   ...defaultTypeCompiler,

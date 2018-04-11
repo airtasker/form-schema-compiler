@@ -103,7 +103,7 @@ const stripAnnotation = (value, key) => {
  * @param key
  * @returns {*}
  */
-const compileValue = (value, key) => {
+const compileValue = (value, key, options) => {
   switch (getAnnotationType(key)) {
     case ANNOTATION_TYPES.Action:
     case ANNOTATION_TYPES.Expression:
@@ -115,7 +115,7 @@ const compileValue = (value, key) => {
     case ANNOTATION_TYPES.Component:
       // recursively compile nested component
       // eslint-disable-next-line no-use-before-define
-      return compileComponents(value);
+      return compileComponents(value, options);
     default:
       return toValueObject(value);
   }
@@ -126,7 +126,8 @@ const compileValue = (value, key) => {
  * e.g.
  * {'{value}': 'expression'} return {'{value}': 'compiled expression'}
  */
-const compileValues = curryRight(mapValues)(compileValue);
+const createCompileValues = options =>
+  curryRight(mapValues)(curryRight(compileValue)(options));
 
 /**
  * compile keys but not value, compile keys to non-annotation key.
@@ -138,7 +139,8 @@ const compileKeys = curryRight(mapKeys)(stripAnnotation);
 /**
  * compile keys and values.
  */
-export const compileProps = flowRight(compileKeys, compileValues);
+export const createCompileProps = options =>
+  flowRight(compileKeys, createCompileValues(options));
 
 /**
  * Take component schema return AST,
@@ -147,11 +149,11 @@ export const compileProps = flowRight(compileKeys, compileValues);
  * @param {{typeCompilers: *}} options
  * @returns {{type: *}}
  */
-const compileComponent = ({ type, ...props }, { typeCompilers }) => {
-  const typeCompiler = createTypeCompiler(type, typeCompilers);
+const compileComponent = ({ type, ...props }, options) => {
+  const typeCompiler = createTypeCompiler(type, options.typeCompilers);
   const composed = flowRight(
     typeCompiler.after,
-    compileProps,
+    createCompileProps(options),
     typeCompiler.before
   );
   return {
@@ -162,7 +164,7 @@ const compileComponent = ({ type, ...props }, { typeCompilers }) => {
 
 /**
  * compile components schema
- * @param {*} components if components is an object covert to [components]
+ * @param {*} components if components is an object convert to [components]
  * @param {{typeCompilers: *}} options
  * @returns {{type: string, components: Array}}
  */
