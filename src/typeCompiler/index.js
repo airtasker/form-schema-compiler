@@ -1,7 +1,5 @@
 import defaultTo from "lodash/defaultTo";
 import noop from "lodash/noop";
-import TextInput from "./textInput";
-import RadioButton from "./radioButton";
 
 /**
  * add type compiler here,
@@ -17,7 +15,7 @@ import RadioButton from "./radioButton";
  * }
  * @type {{TextInput: Function, TextArea: Function, RadioButton: Function}}
  */
-const TYPE_COMPILERS = { TextInput, TextArea: TextInput, RadioButton };
+const TYPE_COMPILERS = {};
 
 // default dummy type compiler
 const defaultTypeCompiler = {

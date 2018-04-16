@@ -1,4 +1,3 @@
-import { commonjs } from "rollup-plugin-commonjs";
 import curryRight from "lodash/curryRight";
 import curry from "lodash/curry";
 import mapValues from "lodash/mapValues";
@@ -18,6 +17,7 @@ import {
   parseDataBindingString
 } from "./parsers";
 import createTypeCompiler from "./typeCompiler";
+import { isVersionCompatible } from "./utils";
 
 const mapValuesFp = curryRight(mapValues);
 const mapKeysFp = curryRight(mapKeys);
@@ -179,7 +179,7 @@ const compileComponent = ({ type, ...props }, options = {}) => {
  * @param {{typeCompilers: *}} options
  * @returns {{type: string, components: Array}}
  */
-function compileComponents(components, options) {
+export function compileComponents(components, options) {
   const componentArray = Array.isArray(components) ? components : [components];
   return {
     type: TYPES.Components,
@@ -190,10 +190,7 @@ function compileComponents(components, options) {
 }
 
 const compile = ({ schemaVersion, component, ...rest }, options) => {
-  if (
-    schemaVersion < COMPATIBLE_SCHEMA_VERSION[0] &&
-    schemaVersion > COMPATIBLE_SCHEMA_VERSION[1]
-  ) {
+  if (!schemaVersion || !isVersionCompatible(schemaVersion)) {
     throw new Error(
       "incompatible version, you may use wrong version form-schema"
     );
@@ -201,8 +198,8 @@ const compile = ({ schemaVersion, component, ...rest }, options) => {
   return {
     ...rest,
     schemaVersion,
-    component: compileComponents(component)
+    component: compileComponents(component, options)
   };
 };
 
-export default compileComponents;
+export default compile;

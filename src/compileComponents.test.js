@@ -1,4 +1,4 @@
-import compileComponents, { compileProps } from "./compileComponents";
+import { compileComponents, compileProps } from "./compileComponents";
 import { TYPES } from "./const";
 
 describe("compileComponents", () => {
