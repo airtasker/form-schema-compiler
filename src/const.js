@@ -90,3 +90,6 @@ export const ANNOTATIONS = {
 export const GLOBAL_FUNCTIONS = {
   toString: "toString"
 };
+
+// [minimum version, maximum version]
+export const COMPATIBLE_SCHEMA_VERSION = ["0.0.1", "0.0.8"];

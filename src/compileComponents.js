@@ -1,16 +1,26 @@
+import { commonjs } from "rollup-plugin-commonjs";
 import curryRight from "lodash/curryRight";
+import curry from "lodash/curry";
 import mapValues from "lodash/mapValues";
 import mapKeys from "lodash/mapKeys";
 import findKey from "lodash/findKey";
 import flowRight from "lodash/flowRight";
 
-import { ANNOTATION_TYPES, ANNOTATIONS, TYPES } from "./const";
+import {
+  ANNOTATION_TYPES,
+  ANNOTATIONS,
+  TYPES,
+  COMPATIBLE_SCHEMA_VERSION
+} from "./const";
 import {
   parseExpressionString,
   parseTemplateString,
   parseDataBindingString
 } from "./parsers";
 import createTypeCompiler from "./typeCompiler";
+
+const mapValuesFp = curryRight(mapValues);
+const mapKeysFp = curryRight(mapKeys);
 
 /**
  * convert json value
@@ -99,11 +109,11 @@ const stripAnnotation = (value, key) => {
 /**
  * compile value to ast expression,
  * examples see expression parsers and tests
- * @param value
- * @param key
- * @returns {*}
+ * @param {*} options
+ * @param {*} value
+ * @param {*} key
  */
-const compileValue = (value, key, options) => {
+const compileValue = curry((options, value, key) => {
   switch (getAnnotationType(key)) {
     case ANNOTATION_TYPES.Action:
     case ANNOTATION_TYPES.Expression:
@@ -119,28 +129,29 @@ const compileValue = (value, key, options) => {
     default:
       return toValueObject(value);
   }
-};
+});
 
 /**
  * compile values but not keys, compile values to ast expression.
  * e.g.
  * {'{value}': 'expression'} return {'{value}': 'compiled expression'}
  */
-const createCompileValues = options =>
-  curryRight(mapValues)(curryRight(compileValue)(options));
+const createCompileValues = options => mapValuesFp(compileValue(options));
 
 /**
  * compile keys but not value, compile keys to non-annotation key.
  * e.g.
  * {'{value}': 'expression', '<component>': 'expression' } return {'value': 'expression', 'component': 'expression'}
  */
-const compileKeys = curryRight(mapKeys)(stripAnnotation);
+const compileKeys = mapKeysFp(stripAnnotation);
 
 /**
  * compile keys and values.
  */
-export const createCompileProps = options =>
-  flowRight(compileKeys, createCompileValues(options));
+export const compileProps = (props, options) =>
+  flowRight(compileKeys, createCompileValues(options))(props);
+
+const compilePropsFp = curryRight(compileProps);
 
 /**
  * Take component schema return AST,
@@ -149,11 +160,11 @@ export const createCompileProps = options =>
  * @param {{typeCompilers: *}} options
  * @returns {{type: *}}
  */
-const compileComponent = ({ type, ...props }, options) => {
+const compileComponent = ({ type, ...props }, options = {}) => {
   const typeCompiler = createTypeCompiler(type, options.typeCompilers);
   const composed = flowRight(
     typeCompiler.after,
-    createCompileProps(options),
+    compilePropsFp(options),
     typeCompiler.before
   );
   return {
@@ -168,12 +179,30 @@ const compileComponent = ({ type, ...props }, options) => {
  * @param {{typeCompilers: *}} options
  * @returns {{type: string, components: Array}}
  */
-function compileComponents(components, options = {}) {
+function compileComponents(components, options) {
   const componentArray = Array.isArray(components) ? components : [components];
   return {
     type: TYPES.Components,
-    components: componentArray.map(curryRight(compileComponent)(options))
+    components: componentArray.map(component =>
+      compileComponent(component, options)
+    )
   };
 }
+
+const compile = ({ schemaVersion, component, ...rest }, options) => {
+  if (
+    schemaVersion < COMPATIBLE_SCHEMA_VERSION[0] &&
+    schemaVersion > COMPATIBLE_SCHEMA_VERSION[1]
+  ) {
+    throw new Error(
+      "incompatible version, you may use wrong version form-schema"
+    );
+  }
+  return {
+    ...rest,
+    schemaVersion,
+    component: compileComponents(component)
+  };
+};
 
 export default compileComponents;

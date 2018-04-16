@@ -1,4 +1,4 @@
-import compileComponents, { createCompileProps } from "./compileComponents";
+import compileComponents, { compileProps } from "./compileComponents";
 import { TYPES } from "./const";
 
 describe("compileComponents", () => {
@@ -62,10 +62,10 @@ describe("compileComponents", () => {
     });
   });
 
-  describe("createCompileProps", () => {
+  describe("compileProps", () => {
     it("Should compile normal props", () => {
       expect(
-        createCompileProps()({
+        compileProps({
           a: "",
           b: null,
           c: 1,
@@ -103,7 +103,7 @@ describe("compileComponents", () => {
 
     it("Should compile expression props", () => {
       expect(
-        createCompileProps()({
+        compileProps({
           "[dataBinding]": "a",
           "{exp}": "b",
           "(action)": "c",
