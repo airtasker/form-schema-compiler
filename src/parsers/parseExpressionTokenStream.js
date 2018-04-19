@@ -165,8 +165,8 @@ const parseExpressionTokenStream = tokenStream => {
    * @returns {Expression}
    */
   function parseAtom() {
-    return maybeCall(() =>
-      maybeUnary(
+    return maybeUnary(() =>
+      maybeCall(
         // eslint-disable-next-line consistent-return
         () => {
           if (isPunctuation(PUNCTUATIONS.Parentheses[0])) {

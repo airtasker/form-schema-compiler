@@ -59,51 +59,78 @@ describe("parseExpressionTokenStream", () => {
   });
 
   describe("should parse expression", () => {
-    it("should parse not unary expression", () => {
-      const parsed = parse("not true");
-      expect(parsed).toEqual({
-        type: TYPES.UnaryExpression,
-        operator: OPERATORS.Not,
-        argument: {
-          type: TYPES.Boolean,
-          value: true
-        }
-      });
-    });
-
-    it("should parse complicate not unary expression", () => {
-      const parsed = parse("not true or not (true is not false)");
-      expect(parsed).toEqual({
-        type: TYPES.BinaryExpression,
-        left: {
+    describe("should parse unary expression", () => {
+      it("should parse not unary expression", () => {
+        const parsed = parse("not true");
+        expect(parsed).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Not,
           argument: {
             type: TYPES.Boolean,
             value: true
           }
-        },
-        operator: OPERATORS.Or,
-        right: {
-          type: TYPES.UnaryExpression,
-          operator: OPERATORS.Not,
-          argument: {
-            type: TYPES.BinaryExpression,
-            left: {
+        });
+      });
+
+      it("should parse not unary expression within binary expression", () => {
+        const parsed = parse("not true or not (true is not false)");
+        expect(parsed).toEqual({
+          type: TYPES.BinaryExpression,
+          left: {
+            type: TYPES.UnaryExpression,
+            operator: OPERATORS.Not,
+            argument: {
               type: TYPES.Boolean,
               value: true
-            },
-            operator: OPERATORS.EqualTo,
-            right: {
-              type: TYPES.UnaryExpression,
-              operator: OPERATORS.Not,
-              argument: {
+            }
+          },
+          operator: OPERATORS.Or,
+          right: {
+            type: TYPES.UnaryExpression,
+            operator: OPERATORS.Not,
+            argument: {
+              type: TYPES.BinaryExpression,
+              left: {
                 type: TYPES.Boolean,
-                value: false
+                value: true
+              },
+              operator: OPERATORS.EqualTo,
+              right: {
+                type: TYPES.UnaryExpression,
+                operator: OPERATORS.Not,
+                argument: {
+                  type: TYPES.Boolean,
+                  value: false
+                }
               }
             }
           }
-        }
+        });
+      });
+
+      it("should parse not unary expression within call expression", () => {
+        const parsed = parse("not hello(not a)");
+        expect(parsed).toEqual({
+          type: TYPES.UnaryExpression,
+          operator: OPERATORS.Not,
+          argument: {
+            type: TYPES.CallExpression,
+            callee: {
+              type: TYPES.Identifier,
+              name: "hello"
+            },
+            arguments: [
+              {
+                type: TYPES.UnaryExpression,
+                operator: OPERATORS.Not,
+                argument: {
+                  type: TYPES.Identifier,
+                  name: "a"
+                }
+              }
+            ]
+          }
+        });
       });
     });
 
