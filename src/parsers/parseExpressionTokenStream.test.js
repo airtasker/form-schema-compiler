@@ -132,29 +132,29 @@ describe("parseExpressionTokenStream", () => {
           }
         });
       });
-    });
 
-    it("should parse subtract unary expression", () => {
-      const parsed = parse("-1");
-      expect(parsed).toEqual({
-        type: TYPES.UnaryExpression,
-        operator: OPERATORS.Subtract,
-        argument: {
-          type: TYPES.Numeric,
-          value: 1
-        }
+      it("should parse subtract unary expression", () => {
+        const parsed = parse("-1");
+        expect(parsed).toEqual({
+          type: TYPES.UnaryExpression,
+          operator: OPERATORS.Subtract,
+          argument: {
+            type: TYPES.Numeric,
+            value: 1
+          }
+        });
       });
-    });
 
-    it("should parse add unary expression", () => {
-      const parsed = parse("+foo");
-      expect(parsed).toEqual({
-        type: TYPES.UnaryExpression,
-        operator: OPERATORS.Add,
-        argument: {
-          type: TYPES.Identifier,
-          name: "foo"
-        }
+      it("should parse add unary expression", () => {
+        const parsed = parse("+foo");
+        expect(parsed).toEqual({
+          type: TYPES.UnaryExpression,
+          operator: OPERATORS.Add,
+          argument: {
+            type: TYPES.Identifier,
+            name: "foo"
+          }
+        });
       });
     });
 
