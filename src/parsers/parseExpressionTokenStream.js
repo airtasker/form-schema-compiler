@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
-import { OPERATORS, PRECEDENCE, PUNCTUATIONS, TYPES } from '../const';
-import * as utils from './utils';
+import { OPERATORS, PRECEDENCE, PUNCTUATIONS, TYPES } from "../const";
+import * as utils from "./utils";
 
 /**
  * transpiling token stream to abstract syntax tree
@@ -16,12 +16,10 @@ import * as utils from './utils';
  * {type: UnaryExpression, operator: '-', argument: {type: numeric, value: 1}}
  * @param tokenStream
  */
-const parseExpressionTokenStream = (tokenStream) => {
-  const isPunctuation = (paren) =>
-    utils.isPunctuation(tokenStream.peek(), paren);
+const parseExpressionTokenStream = tokenStream => {
+  const isPunctuation = paren => utils.isPunctuation(tokenStream.peek(), paren);
 
-  const isOperator = (operator) =>
-    utils.isOperator(tokenStream.peek(), operator);
+  const isOperator = operator => utils.isOperator(tokenStream.peek(), operator);
 
   const isUnary = () =>
     isOperator(OPERATORS.Not) ||
@@ -34,14 +32,14 @@ const parseExpressionTokenStream = (tokenStream) => {
     TYPES.Null,
     TYPES.String,
     TYPES.RegExp,
-    TYPES.Boolean,
+    TYPES.Boolean
   ];
 
   /**
    * skip next punctuation, if next char is not punctuation, throw error
    * @param ch
    */
-  const skipPunctuation = (ch) => {
+  const skipPunctuation = ch => {
     if (!isPunctuation(ch)) {
       tokenStream.croak(`Expecting punctuation: "${ch}"`);
     }
@@ -94,7 +92,7 @@ const parseExpressionTokenStream = (tokenStream) => {
   }
 
   /**
-   * return an unary expressio if current token is -+!
+   * return an unary expression if current token is -+!
    * @param expr
    * @returns {*}
    */
@@ -105,7 +103,7 @@ const parseExpressionTokenStream = (tokenStream) => {
       return {
         type: TYPES.UnaryExpression,
         operator: token.value,
-        argument: expr(),
+        argument: expr()
       };
     }
     return expr();
@@ -123,12 +121,12 @@ const parseExpressionTokenStream = (tokenStream) => {
       const rightOpPrec = PRECEDENCE[token.value];
       if (rightOpPrec > leftOpPrec) {
         tokenStream.next();
-        const right = maybeUnary(() => maybeBinary(parseAtom(), rightOpPrec));
+        const right = maybeBinary(parseAtom(), rightOpPrec);
         const binary = {
           type: TYPES.BinaryExpression,
           operator: token.value,
           left,
-          right,
+          right
         };
         return maybeBinary(binary, leftOpPrec);
       }
@@ -149,8 +147,8 @@ const parseExpressionTokenStream = (tokenStream) => {
         PUNCTUATIONS.Parentheses[0],
         PUNCTUATIONS.Parentheses[1],
         PUNCTUATIONS.Separator,
-        parseExpression,
-      ),
+        parseExpression
+      )
     };
   }
 
@@ -159,7 +157,7 @@ const parseExpressionTokenStream = (tokenStream) => {
    * @returns {Expression}
    */
   function parseExpression() {
-    return maybeCall(() => maybeUnary(() => maybeBinary(parseAtom(), 0)));
+    return maybeCall(() => maybeBinary(parseAtom(), 0));
   }
 
   /**
@@ -185,14 +183,14 @@ const parseExpressionTokenStream = (tokenStream) => {
           }
 
           unexpected(token);
-        },
-      ),
+        }
+      )
     );
   }
 
   function unexpected(token = undefined) {
     tokenStream.croak(
-      `Unexpected token: ${JSON.stringify(token || tokenStream.peek())}`,
+      `Unexpected token: ${JSON.stringify(token || tokenStream.peek())}`
     );
   }
 

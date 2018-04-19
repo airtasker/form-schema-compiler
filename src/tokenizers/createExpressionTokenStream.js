@@ -95,9 +95,9 @@ const createExpressionTokenStream = (
     };
   };
 
-  const readString = () => ({
+  const readString = ch => ({
     type: TYPES.String,
-    value: utils.readEscaped(inputStream, utils.isStringStart)
+    value: utils.readEscaped(inputStream, c => c === ch)
   });
 
   const readOperator = () => {
@@ -144,7 +144,7 @@ const createExpressionTokenStream = (
       return readNext();
     }
     if (utils.isStringStart(ch)) {
-      return readString();
+      return readString(ch);
     }
     if (utils.isDigit(ch)) {
       return readNumber();
