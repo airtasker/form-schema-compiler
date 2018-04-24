@@ -53,7 +53,7 @@ export const PRECEDENCE = {
   [OPERATORS.GreaterThan]: 7,
   [OPERATORS.GreaterThanOrEqualTo]: 7,
   [OPERATORS.LessThan]: 7,
-  [OPERATORS.GreaterThanOrEqualTo]: 7,
+  [OPERATORS.LessThanOrEqualTo]: 7,
   [OPERATORS.EqualTo]: 7,
   [OPERATORS.NotEqualTo]: 7,
   [OPERATORS.Match]: 7,
@@ -92,4 +92,4 @@ export const GLOBAL_FUNCTIONS = {
 };
 
 // [minimum version, maximum version]
-export const COMPATIBLE_SCHEMA_VERSION = ["0.0.1", "0.0.13"];
+export const COMPATIBLE_SCHEMA_VERSION = ["0.0.1", "0.0.14"];
