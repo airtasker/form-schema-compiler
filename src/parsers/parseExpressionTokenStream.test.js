@@ -156,21 +156,143 @@ describe("parseExpressionTokenStream", () => {
           }
         });
       });
+
+      it("should parse chained unary expression", () => {
+        const parsed = parse("not - + foo");
+        expect(parsed).toEqual({
+          type: TYPES.UnaryExpression,
+          operator: OPERATORS.Not,
+          argument: {
+            type: TYPES.UnaryExpression,
+            operator: OPERATORS.Subtract,
+            argument: {
+              type: TYPES.UnaryExpression,
+              operator: OPERATORS.Add,
+              argument: {
+                type: TYPES.Identifier,
+                name: "foo"
+              }
+            }
+          }
+        });
+      });
     });
 
-    it("should parse binary expression", () => {
-      const parsed = parse("a < 1");
+    describe("binary expression", () => {
+      it("should parse binary expression", () => {
+        const parsed = parse("a < 1");
+        expect(parsed).toEqual({
+          type: TYPES.BinaryExpression,
+          operator: OPERATORS.LessThan,
+          left: {
+            type: TYPES.Identifier,
+            name: "a"
+          },
+          right: {
+            type: TYPES.Numeric,
+            value: 1
+          }
+        });
+      });
+
+      it("should parse an complex binary expression", () => {
+        debugger;
+        const parsed = parse("a >= 5 and b <= 2000 or c > 5 or d < 5 ");
+        expect(parsed).toEqual({
+          type: TYPES.BinaryExpression,
+          operator: OPERATORS.Or,
+          left: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.Or,
+            left: {
+              type: TYPES.BinaryExpression,
+              operator: OPERATORS.And,
+              left: {
+                type: TYPES.BinaryExpression,
+                operator: OPERATORS.GreaterThanOrEqualTo,
+                left: {
+                  type: TYPES.Identifier,
+                  name: "a"
+                },
+                right: {
+                  type: TYPES.Numeric,
+                  value: 5
+                }
+              },
+              right: {
+                type: TYPES.BinaryExpression,
+                operator: OPERATORS.LessThanOrEqualTo,
+                left: {
+                  type: TYPES.Identifier,
+                  name: "b"
+                },
+                right: {
+                  type: TYPES.Numeric,
+                  value: 2000
+                }
+              }
+            },
+            right: {
+              type: TYPES.BinaryExpression,
+              operator: OPERATORS.GreaterThan,
+              left: {
+                type: TYPES.Identifier,
+                name: "c"
+              },
+              right: {
+                type: TYPES.Numeric,
+                value: 5
+              }
+            }
+          },
+          right: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.LessThan,
+            left: {
+              type: TYPES.Identifier,
+              name: "d"
+            },
+            right: {
+              type: TYPES.Numeric,
+              value: 5
+            }
+          }
+        });
+      });
+    });
+
+    it("should parse chained call expression", () => {
+      const parsed = parse("hello(1)(2)(3)");
       expect(parsed).toEqual({
-        type: TYPES.BinaryExpression,
-        operator: OPERATORS.LessThan,
-        left: {
-          type: TYPES.Identifier,
-          name: "a"
+        type: TYPES.CallExpression,
+        callee: {
+          type: TYPES.CallExpression,
+          callee: {
+            type: TYPES.CallExpression,
+            callee: {
+              type: TYPES.Identifier,
+              name: "hello"
+            },
+            arguments: [
+              {
+                type: TYPES.Numeric,
+                value: 1
+              }
+            ]
+          },
+          arguments: [
+            {
+              type: TYPES.Numeric,
+              value: 2
+            }
+          ]
         },
-        right: {
-          type: TYPES.Numeric,
-          value: 1
-        }
+        arguments: [
+          {
+            type: TYPES.Numeric,
+            value: 3
+          }
+        ]
       });
     });
 

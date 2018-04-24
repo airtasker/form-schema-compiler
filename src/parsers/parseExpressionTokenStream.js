@@ -86,7 +86,7 @@ const parseExpressionTokenStream = tokenStream => {
   function maybeCall(expr) {
     const callee = expr();
     if (isPunctuation(PUNCTUATIONS.Parentheses[0])) {
-      return parseCall(callee);
+      return maybeCall(() => parseCall(callee));
     }
     return callee;
   }
@@ -157,7 +157,7 @@ const parseExpressionTokenStream = tokenStream => {
    * @returns {Expression}
    */
   function parseExpression() {
-    return maybeCall(() => maybeBinary(parseAtom(), 0));
+    return maybeBinary(parseAtom(), 0);
   }
 
   /**
