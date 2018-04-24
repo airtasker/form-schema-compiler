@@ -103,7 +103,7 @@ const parseExpressionTokenStream = tokenStream => {
       return {
         type: TYPES.UnaryExpression,
         operator: token.value,
-        argument: expr()
+        argument: maybeUnary(expr)
       };
     }
     return expr();
