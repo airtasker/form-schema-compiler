@@ -3,7 +3,7 @@ import apply from "./apply";
 
 const handleRegex = (left, operator, right) => {
   const regex = right instanceof RegExp ? right : new RegExp(right);
-  if (left === undefined) {
+  if (left == null) {
     return regex.test("");
   }
   return regex.test(left);
@@ -25,10 +25,6 @@ export const evalBinaryExpression = ({ operator, left, right }) => {
       return left !== right;
     case OPERATORS.Match:
       return handleRegex(left, operator, right);
-    case OPERATORS.Or:
-      return left || right;
-    case OPERATORS.And:
-      return left && right;
     case OPERATORS.Add:
       return left + right;
     case OPERATORS.Subtract:
@@ -46,11 +42,22 @@ export const evalBinaryExpression = ({ operator, left, right }) => {
   }
 };
 
-const applyBinaryExpression = ({ operator, left, right }, options) =>
-  evalBinaryExpression({
-    operator,
-    left: apply(left, options),
-    right: apply(right, options)
-  });
+const applyBinaryExpression = ({ operator, left, right }, options) => {
+  switch (operator) {
+    // specially handling for OR and AND
+    case OPERATORS.Or:
+      // if left is true will ignore right
+      return apply(left, options) || apply(right, options);
+    case OPERATORS.And:
+      // if left is false will ignore right
+      return apply(left, options) && apply(right, options);
+    default:
+      return evalBinaryExpression({
+        operator,
+        left: apply(left, options),
+        right: apply(right, options)
+      });
+  }
+};
 
 export default applyBinaryExpression;
