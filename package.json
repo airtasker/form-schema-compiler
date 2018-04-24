@@ -1,12 +1,15 @@
 {
   "name": "@airtasker/form-schema-compiler",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "a form schema compiler",
   "main": "./lib/index.js",
   "scripts": {
-    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore test.js",
-    "build:umd": "cross-env BABEL_ENV=rollup NODE_ENV=development rollup -c -o dist/form-schema-compiler.js",
-    "build:umd:min": "cross-env BABEL_ENV=rollup NODE_ENV=min rollup -c -o dist/form-schema-compiler.min.js",
+    "build:commonjs":
+      "cross-env BABEL_ENV=commonjs babel src --out-dir lib --ignore test.js",
+    "build:umd":
+      "cross-env BABEL_ENV=rollup NODE_ENV=development rollup -c -o dist/form-schema-compiler.js",
+    "build:umd:min":
+      "cross-env BABEL_ENV=rollup NODE_ENV=min rollup -c -o dist/form-schema-compiler.min.js",
     "build": "npm run build:commonjs",
     "clean": "rimraf lib dist coverage",
     "prepare": "npm run clean && npm run build",
@@ -16,19 +19,8 @@
     "type": "git",
     "url": "https://github.com/airtasker/form-schema-compiler"
   },
-  "files": [
-    "dist",
-    "lib",
-    "src",
-    "es"
-  ],
-  "keywords": [
-    "react",
-    "reactjs",
-    "backbone",
-    "flux",
-    "redux"
-  ],
+  "files": ["dist", "lib", "src", "es"],
+  "keywords": ["react", "reactjs", "backbone", "flux", "redux"],
   "author": "Zhenxi (Eric) Chen <eric.chen@airtasker.com>",
   "license": "MIT",
   "homepage": "https://github.com/airtasker/form-schema-compiler",
