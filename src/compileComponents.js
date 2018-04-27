@@ -116,7 +116,9 @@ const stripAnnotation = (value, key) => {
 const compileValue = curry((options, value, key) => {
   switch (getAnnotationType(key)) {
     case ANNOTATION_TYPES.Action:
+      return parseExpressionString(value);
     case ANNOTATION_TYPES.Expression:
+      // todo support object
       return parseExpressionString(value);
     case ANNOTATION_TYPES.DataBinding:
       return parseDataBindingString(value);
@@ -161,6 +163,9 @@ const compilePropsFp = curryRight(compileProps);
  * @returns {{type: *}}
  */
 const compileComponent = ({ type, ...props }, options = {}) => {
+  if (!type) {
+    throw new Error("type is a mandatory field in component");
+  }
   const typeCompiler = createTypeCompiler(type, options.typeCompilers);
   const composed = flowRight(
     typeCompiler.after,
@@ -180,6 +185,9 @@ const compileComponent = ({ type, ...props }, options = {}) => {
  * @returns {{type: string, components: Array}}
  */
 export function compileComponents(components, options) {
+  if (typeof components !== "object") {
+    throw new Error("components must be a object or array");
+  }
   const componentArray = Array.isArray(components) ? components : [components];
   return {
     type: TYPES.Components,
@@ -189,12 +197,15 @@ export function compileComponents(components, options) {
   };
 }
 
-const compile = ({ schemaVersion, component, ...rest }, options) => {
+const compile = ({ schemaVersion, ...rest }, options) => {
   if (!schemaVersion || !isVersionCompatible(schemaVersion)) {
     throw new Error(
       "incompatible version, you may use wrong version form-schema"
     );
   }
+
+  const component = options["<component>"] || options.component; // todo: should force to <component>
+
   return {
     ...rest,
     schemaVersion,

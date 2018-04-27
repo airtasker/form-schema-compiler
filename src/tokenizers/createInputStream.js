@@ -4,6 +4,9 @@
  * @returns {{next: (function()), peek: (function(): string), eof: (function(): boolean), croak: (function(*)), position: (function(): {pos: number, line: number, col: number})}}
  */
 const createInputStream = input => {
+  if (typeof input !== "string") {
+    throw new Error("expression must be a string instead of " + typeof input);
+  }
   let pos = 0;
   let line = 1;
   let col = 0;

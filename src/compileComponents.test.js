@@ -2,6 +2,16 @@ import { compileComponents, compileProps } from "./compileComponents";
 import { TYPES } from "./const";
 
 describe("compileComponents", () => {
+  it("Should throw Error if components is not object", () => {
+    expect(() => compileComponents("")).toThrow();
+    expect(() => compileComponents(1)).toThrow();
+    expect(() => compileComponents(1)).toThrow();
+  });
+
+  it("Should throw Error if component don't have type", () => {
+    expect(() => compileComponents({})).toThrow();
+  });
+
   it("Should always wrapped with in components", () => {
     expect(
       compileComponents({
