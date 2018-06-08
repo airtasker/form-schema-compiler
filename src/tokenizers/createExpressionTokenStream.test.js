@@ -187,4 +187,17 @@ describe("createExpressionTokenStream", () => {
       value: "/"
     });
   });
+
+  it("should recognize '/' operator after () [FE-1398]", () => {
+    const stream = create(") /");
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
+      value: ")"
+    });
+    expect(stream.next()).toEqual({
+      type: TYPES.Operator,
+      value: "/"
+    });
+  });
 });

@@ -1,3 +1,5 @@
+import find from "lodash/find";
+import { OPERATORS, PUNCTUATIONS } from "./../const";
 import * as utils from "./utils";
 import { BOOLEANS, TYPES } from "../const";
 
@@ -120,16 +122,25 @@ const createExpressionTokenStream = (
   // eslint-disable-next-line no-use-before-define
   const { peek, next, queue } = utils.createPeekAndNext(readNext, 1);
 
-  const notRegexpPreviousTypes = [
-    TYPES.Numeric,
-    TYPES.String,
-    TYPES.Identifier
+  const regexpPreviousTokens = [
+    {
+      type: TYPES.Punctuation,
+      value: PUNCTUATIONS.Parentheses[0]
+    },
+    {
+      type: TYPES.Punctuation,
+      value: PUNCTUATIONS.Separator
+    },
+    {
+      type: TYPES.Operator,
+      value: OPERATORS.Match
+    }
   ];
 
   // check previous token if read /
   // if previous token is number or string or identifier it's must be division instead of a start of regex
   const canBeRegexp = () =>
-    queue.length === 0 || !notRegexpPreviousTypes.includes(queue[0].type);
+    queue.length === 0 || find(regexpPreviousTokens, queue[0]) !== undefined;
 
   // eslint-disable-next-line consistent-return
   function readNext() {

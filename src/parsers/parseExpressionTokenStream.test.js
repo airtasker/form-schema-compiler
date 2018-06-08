@@ -3,7 +3,7 @@ import createExpressionTokenStream from "../tokenizers/createExpressionTokenStre
 import parseExpressionTokenStream from "./parseExpressionTokenStream";
 
 import { OPERATORS, TYPES } from "../const";
-import { createIdentifier, createValue } from "../utils";
+import { createIdentifier, createValue, createCallExpression } from "../utils";
 
 const parse = str =>
   parseExpressionTokenStream(
@@ -261,17 +261,32 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should work with parenthesis", () => {
-      const parsed = parse("1 * (2 + 3)");
+      const parsed = parse("1 * (2 + 3) / 4");
       expect(parsed).toEqual({
         type: TYPES.BinaryExpression,
-        operator: OPERATORS.Multiply,
-        left: createValue(1),
-        right: {
+        operator: OPERATORS.Divide,
+        left: {
           type: TYPES.BinaryExpression,
-          operator: OPERATORS.Add,
-          left: createValue(2),
-          right: createValue(3)
-        }
+          operator: OPERATORS.Multiply,
+          left: createValue(1),
+          right: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.Add,
+            left: createValue(2),
+            right: createValue(3)
+          }
+        },
+        right: createValue(4)
+      });
+    });
+
+    it("should work with call expression [FE-1398]", () => {
+      const parsed = parse("hello(1) / 2");
+      expect(parsed).toEqual({
+        type: TYPES.BinaryExpression,
+        operator: OPERATORS.Divide,
+        left: createCallExpression(createIdentifier("hello"), createValue(1)),
+        right: createValue(2)
       });
     });
   });
