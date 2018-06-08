@@ -1,13 +1,13 @@
 /* eslint-disable no-use-before-define */
-import * as utils from './utils';
+import * as utils from "./utils";
 import {
   ANNOTATIONS,
   GLOBAL_FUNCTIONS,
   OPERATORS,
   PUNCTUATIONS,
-  TYPES,
-} from '../const';
-import createExpressionTokenStream from './createExpressionTokenStream';
+  TYPES
+} from "../const";
+import createExpressionTokenStream from "./createExpressionTokenStream";
 
 /**
  * transpiling template string input to an expression token stream
@@ -17,9 +17,9 @@ import createExpressionTokenStream from './createExpressionTokenStream';
  * @param inputStream: InputStream
  * @returns {{next: (function(): Object), peek: (function(): Object), eof: (function(): boolean), croak: (function(*)), position: (function(): {pos: number, line: number, col: number})}}
  */
-const createTemplateTokenStream = (inputStream) => {
-  const isBracketStart = (ch) => ch === ANNOTATIONS.Expression[0];
-  const isBracketEnd = (ch) => ch === ANNOTATIONS.Expression[1];
+const createTemplateTokenStream = inputStream => {
+  const isBracketStart = ch => ch === ANNOTATIONS.Expression[0];
+  const isBracketEnd = ch => ch === ANNOTATIONS.Expression[1];
   let state;
   const tokenStacks = [];
 
@@ -36,13 +36,13 @@ const createTemplateTokenStream = (inputStream) => {
         // append + if stream is not end
         tokenStacks.push({
           type: TYPES.Operator,
-          value: OPERATORS.Add,
+          value: OPERATORS.Add
         });
       }
       // append ) after expression
       tokenStacks.push({
         type: TYPES.Punctuation,
-        value: PUNCTUATIONS.Parentheses[1],
+        value: PUNCTUATIONS.Parentheses[1]
       });
     }
     return result;
@@ -53,7 +53,7 @@ const createTemplateTokenStream = (inputStream) => {
     if (inputStream.eof()) {
       return null;
     }
-    let value = '';
+    let value = "";
 
     while (!inputStream.eof()) {
       // concat string cross empty expression
@@ -61,39 +61,39 @@ const createTemplateTokenStream = (inputStream) => {
       if (!inputStream.eof()) {
         expressionStream = createExpressionTokenStream(
           inputStream,
-          isBracketEnd,
+          isBracketEnd
         );
         if (expressionStream.eof()) {
-          // ignore empty expression
-          expressionStream = null;
-          inputStream.next();
-        } else {
-          // switch to expression state
-          state = readExpressionState;
-          // expression should wrapped with + toString( expression )
-          // prepend  to expression
-          tokenStacks.push(
-            {
-              type: TYPES.Punctuation,
-              value: PUNCTUATIONS.Parentheses[0],
-            },
-            {
-              type: TYPES.Identifier,
-              name: GLOBAL_FUNCTIONS.toString,
-            },
-            {
-              type: TYPES.Operator,
-              value: OPERATORS.Add,
-            },
+          // no empty expression
+          inputStream.croak(
+            `Not allow empty expression in string tempalte, e.g. {}, { }`
           );
-          break;
         }
+        // switch to expression state
+        state = readExpressionState;
+        // expression should wrapped with + toString( expression )
+        // prepend  to expression
+        tokenStacks.push(
+          {
+            type: TYPES.Punctuation,
+            value: PUNCTUATIONS.Parentheses[0]
+          },
+          {
+            type: TYPES.Identifier,
+            name: GLOBAL_FUNCTIONS.toString
+          },
+          {
+            type: TYPES.Operator,
+            value: OPERATORS.Add
+          }
+        );
+        break;
       }
     }
 
     return {
       type: TYPES.String,
-      value,
+      value
     };
   }
 
@@ -112,7 +112,7 @@ const createTemplateTokenStream = (inputStream) => {
     ...inputStream,
     next,
     peek,
-    eof,
+    eof
   };
 };
 

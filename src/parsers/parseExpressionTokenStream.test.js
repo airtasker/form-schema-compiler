@@ -3,6 +3,7 @@ import createExpressionTokenStream from "../tokenizers/createExpressionTokenStre
 import parseExpressionTokenStream from "./parseExpressionTokenStream";
 
 import { OPERATORS, TYPES } from "../const";
+import { createIdentifier, createValue } from "../utils";
 
 const parse = str =>
   parseExpressionTokenStream(
@@ -12,49 +13,31 @@ const parse = str =>
 describe("parseExpressionTokenStream", () => {
   it("should parse identifier", () => {
     const parsed = parse("foobar");
-    expect(parsed).toEqual({
-      type: TYPES.Identifier,
-      name: "foobar"
-    });
+    expect(parsed).toEqual(createIdentifier("foobar"));
   });
 
   it("should parse null", () => {
     const parsed = parse("null");
-    expect(parsed).toEqual({
-      type: TYPES.Null,
-      value: null
-    });
+    expect(parsed).toEqual(createValue(null));
   });
 
   it("should parse string", () => {
     const parsed = parse(`'asdfsad"f'`);
-    expect(parsed).toEqual({
-      type: TYPES.String,
-      value: 'asdfsad"f'
-    });
+    expect(parsed).toEqual(createValue('asdfsad"f'));
 
     const parsed2 = parse(`"asdfsad'f"`);
-    expect(parsed2).toEqual({
-      type: TYPES.String,
-      value: "asdfsad'f"
-    });
+    expect(parsed2).toEqual(createValue("asdfsad'f"));
   });
 
   describe("should parse boolean", () => {
     it("should parse true", () => {
       const parsed = parse("true");
-      expect(parsed).toEqual({
-        type: TYPES.Boolean,
-        value: true
-      });
+      expect(parsed).toEqual(createValue(true));
     });
 
     it("should parse false", () => {
       const parsed = parse("false");
-      expect(parsed).toEqual({
-        type: TYPES.Boolean,
-        value: false
-      });
+      expect(parsed).toEqual(createValue(false));
     });
   });
 
@@ -65,10 +48,7 @@ describe("parseExpressionTokenStream", () => {
         expect(parsed).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Not,
-          argument: {
-            type: TYPES.Boolean,
-            value: true
-          }
+          argument: createValue(true)
         });
       });
 
@@ -79,10 +59,7 @@ describe("parseExpressionTokenStream", () => {
           left: {
             type: TYPES.UnaryExpression,
             operator: OPERATORS.Not,
-            argument: {
-              type: TYPES.Boolean,
-              value: true
-            }
+            argument: createValue(true)
           },
           operator: OPERATORS.Or,
           right: {
@@ -90,18 +67,12 @@ describe("parseExpressionTokenStream", () => {
             operator: OPERATORS.Not,
             argument: {
               type: TYPES.BinaryExpression,
-              left: {
-                type: TYPES.Boolean,
-                value: true
-              },
+              left: createValue(true),
               operator: OPERATORS.EqualTo,
               right: {
                 type: TYPES.UnaryExpression,
                 operator: OPERATORS.Not,
-                argument: {
-                  type: TYPES.Boolean,
-                  value: false
-                }
+                argument: createValue(false)
               }
             }
           }
@@ -115,18 +86,12 @@ describe("parseExpressionTokenStream", () => {
           operator: OPERATORS.Not,
           argument: {
             type: TYPES.CallExpression,
-            callee: {
-              type: TYPES.Identifier,
-              name: "hello"
-            },
+            callee: createIdentifier("hello"),
             arguments: [
               {
                 type: TYPES.UnaryExpression,
                 operator: OPERATORS.Not,
-                argument: {
-                  type: TYPES.Identifier,
-                  name: "a"
-                }
+                argument: createIdentifier("a")
               }
             ]
           }
@@ -138,10 +103,7 @@ describe("parseExpressionTokenStream", () => {
         expect(parsed).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Subtract,
-          argument: {
-            type: TYPES.Numeric,
-            value: 1
-          }
+          argument: createValue(1)
         });
       });
 
@@ -150,10 +112,7 @@ describe("parseExpressionTokenStream", () => {
         expect(parsed).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Add,
-          argument: {
-            type: TYPES.Identifier,
-            name: "foo"
-          }
+          argument: createIdentifier("foo")
         });
       });
 
@@ -168,10 +127,7 @@ describe("parseExpressionTokenStream", () => {
             argument: {
               type: TYPES.UnaryExpression,
               operator: OPERATORS.Add,
-              argument: {
-                type: TYPES.Identifier,
-                name: "foo"
-              }
+              argument: createIdentifier("foo")
             }
           }
         });
@@ -184,14 +140,8 @@ describe("parseExpressionTokenStream", () => {
         expect(parsed).toEqual({
           type: TYPES.BinaryExpression,
           operator: OPERATORS.LessThan,
-          left: {
-            type: TYPES.Identifier,
-            name: "a"
-          },
-          right: {
-            type: TYPES.Numeric,
-            value: 1
-          }
+          left: createIdentifier("a"),
+          right: createValue(1)
         });
       });
 
@@ -210,52 +160,28 @@ describe("parseExpressionTokenStream", () => {
               left: {
                 type: TYPES.BinaryExpression,
                 operator: OPERATORS.GreaterThanOrEqualTo,
-                left: {
-                  type: TYPES.Identifier,
-                  name: "a"
-                },
-                right: {
-                  type: TYPES.Numeric,
-                  value: 5
-                }
+                left: createIdentifier("a"),
+                right: createValue(5)
               },
               right: {
                 type: TYPES.BinaryExpression,
                 operator: OPERATORS.LessThanOrEqualTo,
-                left: {
-                  type: TYPES.Identifier,
-                  name: "b"
-                },
-                right: {
-                  type: TYPES.Numeric,
-                  value: 2000
-                }
+                left: createIdentifier("b"),
+                right: createValue(2000)
               }
             },
             right: {
               type: TYPES.BinaryExpression,
               operator: OPERATORS.GreaterThan,
-              left: {
-                type: TYPES.Identifier,
-                name: "c"
-              },
-              right: {
-                type: TYPES.Numeric,
-                value: 5
-              }
+              left: createIdentifier("c"),
+              right: createValue(5)
             }
           },
           right: {
             type: TYPES.BinaryExpression,
             operator: OPERATORS.LessThan,
-            left: {
-              type: TYPES.Identifier,
-              name: "d"
-            },
-            right: {
-              type: TYPES.Numeric,
-              value: 5
-            }
+            left: createIdentifier("d"),
+            right: createValue(5)
           }
         });
       });
@@ -269,30 +195,12 @@ describe("parseExpressionTokenStream", () => {
           type: TYPES.CallExpression,
           callee: {
             type: TYPES.CallExpression,
-            callee: {
-              type: TYPES.Identifier,
-              name: "hello"
-            },
-            arguments: [
-              {
-                type: TYPES.Numeric,
-                value: 1
-              }
-            ]
+            callee: createIdentifier("hello"),
+            arguments: [createValue(1)]
           },
-          arguments: [
-            {
-              type: TYPES.Numeric,
-              value: 2
-            }
-          ]
+          arguments: [createValue(2)]
         },
-        arguments: [
-          {
-            type: TYPES.Numeric,
-            value: 3
-          }
-        ]
+        arguments: [createValue(3)]
       });
     });
 
@@ -300,20 +208,8 @@ describe("parseExpressionTokenStream", () => {
       const parsed = parse('hello(a, "c")');
       expect(parsed).toEqual({
         type: TYPES.CallExpression,
-        callee: {
-          type: TYPES.Identifier,
-          name: "hello"
-        },
-        arguments: [
-          {
-            type: TYPES.Identifier,
-            name: "a"
-          },
-          {
-            type: TYPES.String,
-            value: "c"
-          }
-        ]
+        callee: createIdentifier("hello"),
+        arguments: [createIdentifier("a"), createValue("c")]
       });
     });
 
@@ -325,30 +221,18 @@ describe("parseExpressionTokenStream", () => {
         left: {
           type: TYPES.BinaryExpression,
           operator: OPERATORS.Add,
-          left: {
-            type: TYPES.Numeric,
-            value: 1
-          },
+          left: createValue(1),
           right: {
             type: TYPES.BinaryExpression,
             operator: OPERATORS.Multiply,
-            left: {
-              type: TYPES.Numeric,
-              value: 2
-            },
-            right: {
-              type: TYPES.Numeric,
-              value: 3
-            }
+            left: createValue(2),
+            right: createValue(3)
           }
         },
         right: {
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Subtract,
-          argument: {
-            type: TYPES.Numeric,
-            value: 4
-          }
+          argument: createValue(4)
         }
       });
     });
@@ -361,26 +245,17 @@ describe("parseExpressionTokenStream", () => {
         left: {
           type: TYPES.BinaryExpression,
           operator: OPERATORS.Multiply,
-          left: {
-            type: TYPES.Numeric,
-            value: 1
-          },
+          left: createValue(1),
           right: {
             type: TYPES.UnaryExpression,
             operator: OPERATORS.Add,
-            argument: {
-              type: TYPES.Numeric,
-              value: 2
-            }
+            argument: createValue(2)
           }
         },
         right: {
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Not,
-          argument: {
-            type: TYPES.Numeric,
-            value: 3
-          }
+          argument: createValue(3)
         }
       });
     });
@@ -390,21 +265,12 @@ describe("parseExpressionTokenStream", () => {
       expect(parsed).toEqual({
         type: TYPES.BinaryExpression,
         operator: OPERATORS.Multiply,
-        left: {
-          type: TYPES.Numeric,
-          value: 1
-        },
+        left: createValue(1),
         right: {
           type: TYPES.BinaryExpression,
           operator: OPERATORS.Add,
-          left: {
-            type: TYPES.Numeric,
-            value: 2
-          },
-          right: {
-            type: TYPES.Numeric,
-            value: 3
-          }
+          left: createValue(2),
+          right: createValue(3)
         }
       });
     });

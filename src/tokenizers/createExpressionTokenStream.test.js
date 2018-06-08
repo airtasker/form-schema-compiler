@@ -1,6 +1,7 @@
 import createExpressionTokenStream from "./createExpressionTokenStream";
 import createInputStream from "./createInputStream";
 import { TYPES } from "../const";
+import { createIdentifier, createValue } from "../utils";
 
 const create = str => createExpressionTokenStream(createInputStream(str));
 
@@ -16,66 +17,36 @@ describe("createExpressionTokenStream", () => {
 
   it("should recognize identifier", () => {
     const stream = create("hello");
-    expect(stream.next()).toEqual({
-      type: TYPES.Identifier,
-      name: "hello"
-    });
+    expect(stream.next()).toEqual(createIdentifier("hello"));
   });
 
   it("should recognize null", () => {
     const stream = create("null");
-    expect(stream.next()).toEqual({
-      type: TYPES.Null,
-      value: null
-    });
+    expect(stream.next()).toEqual(createValue(null));
   });
 
   it("should recognize boolean", () => {
     const stream = create("false true");
 
-    expect(stream.next()).toEqual({
-      type: TYPES.Boolean,
-      value: false
-    });
-    expect(stream.next()).toEqual({
-      type: TYPES.Boolean,
-      value: true
-    });
+    expect(stream.next()).toEqual(createValue(false));
+    expect(stream.next()).toEqual(createValue(true));
   });
 
   describe("should recognize number", () => {
     it("should recognize integer", () => {
       const stream = create("0 1 23456 7890");
 
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 0
-      });
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 1
-      });
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 23456
-      });
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 7890
-      });
+      expect(stream.next()).toEqual(createValue(0));
+      expect(stream.next()).toEqual(createValue(1));
+      expect(stream.next()).toEqual(createValue(23456));
+      expect(stream.next()).toEqual(createValue(7890));
     });
 
     it("should recognize float", () => {
       const stream = create("3.14 5.2678");
 
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 3.14
-      });
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 5.2678
-      });
+      expect(stream.next()).toEqual(createValue(3.14));
+      expect(stream.next()).toEqual(createValue(5.2678));
     });
   });
 
@@ -83,73 +54,52 @@ describe("createExpressionTokenStream", () => {
     it("should recognize double quote string", () => {
       const stream = create('"asdf"');
 
-      expect(stream.next()).toEqual({
-        type: TYPES.String,
-        value: "asdf"
-      });
+      expect(stream.next()).toEqual(createValue("asdf"));
     });
 
     it("should recognize single quote string", () => {
       const stream = create("'asdf'");
 
-      expect(stream.next()).toEqual({
-        type: TYPES.String,
-        value: "asdf"
-      });
+      expect(stream.next()).toEqual(createValue("asdf"));
+    });
+
+    it("should recognize mixed quote string", () => {
+      const stream = create("'asdf\"'");
+
+      expect(stream.next()).toEqual(createValue('asdf"'));
     });
 
     it("should recognize escape", () => {
       const stream = create("'\\a\\s\\d\\f\\\\'");
 
-      expect(stream.next()).toEqual({
-        type: TYPES.String,
-        value: "asdf\\"
-      });
+      expect(stream.next()).toEqual(createValue("asdf\\"));
     });
   });
 
   describe("should recognize regexp", () => {
     it("should recognize regexp in binary expression", () => {
       const stream = create("budget match /\\s\\//gimuy");
-      expect(stream.next()).toEqual({
-        type: TYPES.Identifier,
-        name: "budget"
-      });
+      expect(stream.next()).toEqual(createIdentifier("budget"));
       expect(stream.next()).toEqual({
         type: TYPES.Operator,
         value: "match"
       });
-      expect(stream.next()).toEqual({
-        type: TYPES.RegExp,
-        pattern: "\\s\\/",
-        flags: "gimuy"
-      });
+      expect(stream.next()).toEqual(createValue(/\s\//gimuy));
     });
 
     it("should recognize regexp at start", () => {
       const stream = create("/[abc]/iy ");
-      expect(stream.next()).toEqual({
-        type: TYPES.RegExp,
-        pattern: "[abc]",
-        flags: "iy"
-      });
+      expect(stream.next()).toEqual(createValue(/[abc]/iy));
     });
 
     it("should recognize regexp in call expression", () => {
       const stream = create("call(/\\s\\//g)");
-      expect(stream.next()).toEqual({
-        type: TYPES.Identifier,
-        name: "call"
-      });
+      expect(stream.next()).toEqual(createIdentifier("call"));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "("
       });
-      expect(stream.next()).toEqual({
-        type: TYPES.RegExp,
-        pattern: "\\s\\/",
-        flags: "g"
-      });
+      expect(stream.next()).toEqual(createValue(/\s\//g));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: ")"
@@ -231,10 +181,7 @@ describe("createExpressionTokenStream", () => {
       type: TYPES.Operator,
       value: "isnt"
     });
-    expect(stream.next()).toEqual({
-      type: TYPES.Numeric,
-      value: 1
-    });
+    expect(stream.next()).toEqual(createValue(1));
     expect(stream.next()).toEqual({
       type: TYPES.Operator,
       value: "/"
