@@ -151,7 +151,10 @@ const compileKeys = mapKeysFp(stripAnnotation);
  * compile keys and values.
  */
 export const compileProps = (props, options) =>
-  flowRight(compileKeys, createCompileValues(options))(props);
+  flowRight(
+    compileKeys,
+    createCompileValues(options)
+  )(props);
 
 const compilePropsFp = curryRight(compileProps);
 
@@ -204,7 +207,7 @@ const compile = ({ schemaVersion, ...rest }, options) => {
     );
   }
 
-  const component = options["<component>"] || options.component; // todo: should force to <component>
+  const component = rest["<component>"];
 
   return {
     ...rest,
