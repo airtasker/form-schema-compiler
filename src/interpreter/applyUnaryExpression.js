@@ -1,17 +1,16 @@
-import { OPERATORS } from '../const';
-import apply from './apply';
+import { OPERATORS } from "../const";
 
-const applyUnaryExpression = ({ operator, argument }, options) => {
+const applyUnaryExpression = ({ operator, argument }, { apply }) => {
   switch (operator) {
     case OPERATORS.Not:
-      return !apply(argument, options);
+      return !apply(argument);
     case OPERATORS.Add:
-      return +apply(argument, options);
+      return +apply(argument);
     case OPERATORS.Subtract:
-      return -apply(argument, options);
+      return -apply(argument);
     default:
       throw new Error(
-        `wrong UnaryExpression ${JSON.stringify({ operator, argument })}`,
+        `wrong UnaryExpression ${JSON.stringify({ operator, argument })}`
       );
   }
 };

@@ -28,20 +28,35 @@ const TypeHandlers = {
  *
  * @param type
  * @param expression
- * @param options:{{variableGetter, applyComponents}}
+ * @param options:{{variableGetter, applyComponents, apply}}
  * @returns {*}
  */
-const apply = ({ type, ...expression }, options = {}) => {
-  if (
-    typeof options.variableGetter !== "function" ||
-    typeof options.applyComponents !== "function"
-  ) {
-    throw new Error(`Can't found variableGetter or applyComponents in options`);
-  }
+const apply = ({ type, ...expression }, options) => {
   if (hasKey(TypeHandlers, type)) {
     return TypeHandlers[type](expression, options);
   }
   throw new Error(`Wrong type ${type}, ${JSON.stringify(expression)}`);
 };
 
-export default apply;
+/**
+ * build options and apply
+ * @param {*} expression
+ * @param {*} options
+ */
+const buildOptionsAndApply = (expression, options = {}) => {
+  if (
+    typeof options.variableGetter !== "function" ||
+    typeof options.applyComponents !== "function"
+  ) {
+    throw new Error(`Can't found variableGetter or applyComponents in options`);
+  }
+
+  const optionsWithApply = {
+    ...options,
+    apply: expr => apply(expr, optionsWithApply)
+  };
+
+  return apply(expression, optionsWithApply);
+};
+
+export default buildOptionsAndApply;

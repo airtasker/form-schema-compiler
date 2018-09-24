@@ -1,5 +1,4 @@
 import { OPERATORS } from "../const";
-import apply from "./apply";
 
 const handleRegex = (left, operator, right) => {
   const regex = right instanceof RegExp ? right : new RegExp(right);
@@ -42,20 +41,20 @@ export const evalBinaryExpression = ({ operator, left, right }) => {
   }
 };
 
-const applyBinaryExpression = ({ operator, left, right }, options) => {
+const applyBinaryExpression = ({ operator, left, right }, { apply }) => {
   switch (operator) {
     // specially handling for OR and AND
     case OPERATORS.Or:
       // if left is true will ignore right
-      return apply(left, options) || apply(right, options);
+      return apply(left) || apply(right);
     case OPERATORS.And:
       // if left is false will ignore right
-      return apply(left, options) && apply(right, options);
+      return apply(left) && apply(right);
     default:
       return evalBinaryExpression({
         operator,
-        left: apply(left, options),
-        right: apply(right, options)
+        left: apply(left),
+        right: apply(right)
       });
   }
 };
