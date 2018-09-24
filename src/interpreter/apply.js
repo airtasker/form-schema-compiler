@@ -3,6 +3,9 @@ import applyIdentifier from "./applyIdentifier";
 import applyUnaryExpression from "./applyUnaryExpression";
 import applyBinaryExpression from "./applyBinaryExpression";
 import applyCallExpression from "./applyCallExpression";
+import applyMemberObjectExpression from "./applyMemberObjectExpression";
+import applyObjectExpression from "./applyObjectExpression";
+import applyArrayExpression from "./applyArrayExpression";
 import { hasKey } from "../utils";
 
 const getValue = ({ value }) => value;
@@ -21,7 +24,10 @@ const TypeHandlers = {
   [TYPES.UnaryExpression]: applyUnaryExpression,
   [TYPES.BinaryExpression]: applyBinaryExpression,
   [TYPES.CallExpression]: applyCallExpression,
-  [TYPES.Components]: applyComponents
+  [TYPES.Components]: applyComponents,
+  [TYPES.MemberExpression]: applyMemberObjectExpression,
+  [TYPES.ObjectExpression]: applyObjectExpression,
+  [TYPES.ArrayExpression]: applyArrayExpression
 };
 
 /**

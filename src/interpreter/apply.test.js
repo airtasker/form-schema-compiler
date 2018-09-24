@@ -120,4 +120,39 @@ describe("interpreter apply()", () => {
     );
     expect(options.variableGetter).toHaveBeenCalled();
   });
+
+  it("should support Object", () => {
+    expect(applyWithStringExpression("{}", options)).toEqual({});
+
+    options.variableGetter.mockReturnValueOnce("d");
+
+    expect(
+      applyWithStringExpression(
+        '{"a": 1, "b": {}, c: 1 + 2, "e": "hello"}',
+        options
+      )
+    ).toEqual({
+      a: 1,
+      b: {},
+      d: 3,
+      e: "hello"
+    });
+  });
+
+  it("should support Array", () => {
+    expect(applyWithStringExpression("[]", options)).toEqual([]);
+
+    options.variableGetter.mockReturnValueOnce("c");
+    expect(
+      applyWithStringExpression('["a", b, 3, {}, 1 + 1]', options)
+    ).toEqual(["a", "c", 3, {}, 2]);
+  });
+
+  it("should support MemberObject", () => {
+    options.variableGetter.mockReturnValueOnce([0]);
+    expect(applyWithStringExpression("a[0]", options)).toBe(0);
+
+    options.variableGetter.mockReturnValueOnce({ a: 1 });
+    expect(applyWithStringExpression("a['a']", options)).toBe(1);
+  });
 });
