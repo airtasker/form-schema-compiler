@@ -1,3 +1,4 @@
+import flatten from "lodash/flatten";
 import { BOOLEANS, OPERATORS, PUNCTUATIONS } from "../const";
 
 export const isBoolean = str => BOOLEANS.includes(str);
@@ -24,14 +25,15 @@ export const isIdStart = ch => /[a-z_]/i.test(ch);
 
 export const isId = ch => isIdStart(ch) || isDigit(ch);
 
-const punctuationChars = [...PUNCTUATIONS.Parentheses, PUNCTUATIONS.Separator];
+const punctuationChars = flatten(Object.values(PUNCTUATIONS));
+
 export const isPunctuation = ch => punctuationChars.includes(ch);
 
 export const isRegexpStart = ch => ch === "/";
 
 export const isStringStart = ch => ch === "'" || ch === '"';
 
-const whitespaceChars = " \t\n";
+const whitespaceChars = " \t\n\r";
 export const isWhitespace = ch => whitespaceChars.includes(ch);
 
 /**

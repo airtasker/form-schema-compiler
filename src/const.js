@@ -2,12 +2,18 @@ export const TYPES = {
   Numeric: "Numeric",
   String: "String",
   Boolean: "Boolean",
+  Object: "Object",
+  Array: "Array",
   Null: "Null",
   RegExp: "RegExp",
   Identifier: "Identifier",
+  ObjectExpression: "ObjectExpression",
+  ObjectProperty: "ObjectProperty",
+  ArrayExpression: "ArrayExpression",
   BinaryExpression: "BinaryExpression",
   UnaryExpression: "UnaryExpression",
   CallExpression: "CallExpression",
+  MemberExpression: "MemberExpression",
   Components: "Components",
   Operator: "Operator",
   Punctuation: "Punctuation",
@@ -24,6 +30,8 @@ export const PRIMITIVES = [
 export const OBJECTS = [TYPES.RegExp, TYPES.Identifier, TYPES.Component];
 
 export const EXPRESSIONS = [
+  TYPES.ObjectExpression,
+  TYPES.ArrayExpression,
   TYPES.BinaryExpression,
   TYPES.CallExpression,
   TYPES.UnaryExpression
@@ -67,8 +75,11 @@ export const PRECEDENCE = {
 export const BOOLEANS = ["false", "true"];
 
 export const PUNCTUATIONS = {
+  Braces: ["{", "}"],
+  SquareBrackets: ["[", "]"],
   Parentheses: ["(", ")"],
-  Separator: ","
+  Separator: ",",
+  Colon: ":"
 };
 
 export const ANNOTATION_TYPES = {

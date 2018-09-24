@@ -108,7 +108,7 @@ describe("createExpressionTokenStream", () => {
   });
 
   it("should recognize punctuation", () => {
-    const stream = create("(),");
+    const stream = create("(){}[],:");
 
     expect(stream.next()).toEqual({
       type: TYPES.Punctuation,
@@ -122,7 +122,32 @@ describe("createExpressionTokenStream", () => {
 
     expect(stream.next()).toEqual({
       type: TYPES.Punctuation,
+      value: "{"
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
+      value: "}"
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
+      value: "["
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
+      value: "]"
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
       value: ","
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
+      value: ":"
     });
   });
 

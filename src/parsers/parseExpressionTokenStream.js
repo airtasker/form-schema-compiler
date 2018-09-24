@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+import flow from "lodash/flow";
 import { OPERATORS, PRECEDENCE, PUNCTUATIONS, TYPES } from "../const";
 import * as utils from "./utils";
 
@@ -7,8 +8,8 @@ import * as utils from "./utils";
  * abstract syntax tree https://en.wikipedia.org/wiki/Abstract_syntax_tree
  * a recursive descent parser https://en.wikipedia.org/wiki/Recursive_descent_parser
  * There are a lot of ways to write parser, like LL parser LR parser.
- * recursive descent parser is the easiest way to write, but not the most effective way.
- * Because we are building a very simple parser, we chosen using recursive descent way to write.
+ * recursive descent parser is the easiest way to write.
+ * Because we are building a very simple parser, and need it run in browser, so we chosen using recursive descent way to write.
  *
  * e.g.
  * [{type: operator, value: '-'}, {type: numeric, value: 1}]
@@ -78,17 +79,31 @@ const parseExpressionTokenStream = tokenStream => {
     return args;
   };
 
+  const maybeCallOrMember = flow(
+    maybeCall,
+    maybeMember
+  );
   /**
-   * return a call expression if next token is (
-   * @param expr
+   * return a call expression if next token is '('
+   * @param callee
    * @returns {*}
    */
-  function maybeCall(expr) {
-    const callee = expr();
+  function maybeCall(callee) {
     if (isPunctuation(PUNCTUATIONS.Parentheses[0])) {
-      return maybeCall(() => parseCall(callee));
+      return maybeCallOrMember(parseCall(callee));
     }
     return callee;
+  }
+
+  /**
+   *  return a member expression if next token is '['
+   * @param object
+   */
+  function maybeMember(object) {
+    if (isPunctuation(PUNCTUATIONS.SquareBrackets[0])) {
+      return maybeCallOrMember(parseMember(object));
+    }
+    return object;
   }
 
   /**
@@ -144,11 +159,74 @@ const parseExpressionTokenStream = tokenStream => {
       type: TYPES.CallExpression,
       callee,
       arguments: delimited(
-        PUNCTUATIONS.Parentheses[0],
-        PUNCTUATIONS.Parentheses[1],
-        PUNCTUATIONS.Separator,
+        PUNCTUATIONS.Parentheses[0], // (
+        PUNCTUATIONS.Parentheses[1], // )
+        PUNCTUATIONS.Separator, // ,
         parseExpression
       )
+    };
+  }
+
+  /**
+   * parse object
+   * @returns {{type: 'ObjectExpression', properties: [...]}}
+   */
+  function parseObject() {
+    return {
+      type: TYPES.ObjectExpression,
+      properties: delimited(
+        PUNCTUATIONS.Braces[0], // {
+        PUNCTUATIONS.Braces[1], // }
+        PUNCTUATIONS.Separator, // ,
+        parseObjectProperty // should have property key : value
+      )
+    };
+  }
+
+  function parseObjectProperty() {
+    const key = parseAtom();
+
+    if (![TYPES.Identifier, TYPES.String, TYPES.Numeric].includes(key.type)) {
+      tokenStream.croak(
+        `Object key should only be identifier, string or number, instead of "${
+          key.value
+        }:${key.type}"`
+      );
+    }
+
+    skipPunctuation(PUNCTUATIONS.Colon);
+
+    return {
+      key,
+      value: parseExpression()
+    };
+  }
+
+  /**
+   * parse array
+   * @returns {{type: 'ArrayExpression', elements: [...]}}
+   */
+  function parseArray() {
+    return {
+      type: TYPES.ArrayExpression,
+      elements: delimited(
+        PUNCTUATIONS.SquareBrackets[0], // [
+        PUNCTUATIONS.SquareBrackets[1], // ]
+        PUNCTUATIONS.Separator, // ,
+        parseExpression // should have property key : value
+      )
+    };
+  }
+
+  function parseMember(object) {
+    skipPunctuation(PUNCTUATIONS.SquareBrackets[0]);
+    const property = parseExpression();
+    skipPunctuation(PUNCTUATIONS.SquareBrackets[1]);
+
+    return {
+      type: TYPES.MemberExpression,
+      object,
+      property
     };
   }
 
@@ -164,28 +242,39 @@ const parseExpressionTokenStream = tokenStream => {
    * parse single expression, could be a call expression, an unary expression, an identifier or an expression inside a parentheses
    * @returns {Expression}
    */
-  function parseAtom() {
-    return maybeUnary(() =>
-      maybeCall(
-        // eslint-disable-next-line consistent-return
-        () => {
-          if (isPunctuation(PUNCTUATIONS.Parentheses[0])) {
-            // if read parentheses, then will parse the expression inside the parentheses
-            tokenStream.next();
-            const exp = parseExpression();
-            skipPunctuation(PUNCTUATIONS.Parentheses[1]);
-            return exp;
-          }
+  function parseAtom(skipUnaryCheck = false) {
+    return maybeUnary(() => maybeCallOrMember(parseSimpleAtom()));
+  }
 
-          const token = tokenStream.next();
-          if (atomTokenTypes.includes(token.type)) {
-            return token;
-          }
+  /**
+   * parse a simple atom, e.g identifier, number, string, object, array, boolean, etc
+   * @returns {Expression}
+   */
+  function parseSimpleAtom() {
+    if (isPunctuation(PUNCTUATIONS.Parentheses[0])) {
+      // if read parentheses, then will parse the expression inside the parentheses
+      tokenStream.next();
+      const exp = parseExpression();
+      skipPunctuation(PUNCTUATIONS.Parentheses[1]);
+      return exp;
+    }
 
-          unexpected(token);
-        }
-      )
-    );
+    if (isPunctuation(PUNCTUATIONS.Braces[0])) {
+      // if read braces start, then it's an Object
+      return parseObject();
+    }
+
+    if (isPunctuation(PUNCTUATIONS.SquareBrackets[0])) {
+      // if read square brackets start, then it's an Array
+      return parseArray();
+    }
+
+    const token = tokenStream.next();
+    if (atomTokenTypes.includes(token.type)) {
+      return token;
+    }
+
+    unexpected(token);
   }
 
   function unexpected(token = undefined) {

@@ -182,7 +182,7 @@ const createExpressionTokenStream = (
         value: inputStream.next()
       };
     }
-    inputStream.croak(`Can't handle character: ${ch}`);
+    inputStream.croak(`Can't handle character: "${ch}"`);
   }
 
   const eof = () => peek() === null;

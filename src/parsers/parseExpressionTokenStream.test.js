@@ -12,40 +12,40 @@ const parse = str =>
 
 describe("parseExpressionTokenStream", () => {
   it("should parse identifier", () => {
-    const parsed = parse("foobar");
-    expect(parsed).toEqual(createIdentifier("foobar"));
+    const ast = parse("foobar");
+    expect(ast).toEqual(createIdentifier("foobar"));
   });
 
   it("should parse null", () => {
-    const parsed = parse("null");
-    expect(parsed).toEqual(createValue(null));
+    const ast = parse("null");
+    expect(ast).toEqual(createValue(null));
   });
 
   it("should parse string", () => {
-    const parsed = parse(`'asdfsad"f'`);
-    expect(parsed).toEqual(createValue('asdfsad"f'));
+    const ast = parse(`'asdfsad"f'`);
+    expect(ast).toEqual(createValue('asdfsad"f'));
 
-    const parsed2 = parse(`"asdfsad'f"`);
-    expect(parsed2).toEqual(createValue("asdfsad'f"));
+    const ast2 = parse(`"asdfsad'f"`);
+    expect(ast2).toEqual(createValue("asdfsad'f"));
   });
 
   describe("should parse boolean", () => {
     it("should parse true", () => {
-      const parsed = parse("true");
-      expect(parsed).toEqual(createValue(true));
+      const ast = parse("true");
+      expect(ast).toEqual(createValue(true));
     });
 
     it("should parse false", () => {
-      const parsed = parse("false");
-      expect(parsed).toEqual(createValue(false));
+      const ast = parse("false");
+      expect(ast).toEqual(createValue(false));
     });
   });
 
   describe("should parse expression", () => {
     describe("should parse unary expression", () => {
       it("should parse not unary expression", () => {
-        const parsed = parse("not true");
-        expect(parsed).toEqual({
+        const ast = parse("not true");
+        expect(ast).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Not,
           argument: createValue(true)
@@ -53,8 +53,8 @@ describe("parseExpressionTokenStream", () => {
       });
 
       it("should parse not unary expression within binary expression", () => {
-        const parsed = parse("not true or not (true is not false)");
-        expect(parsed).toEqual({
+        const ast = parse("not true or not (true is not false)");
+        expect(ast).toEqual({
           type: TYPES.BinaryExpression,
           left: {
             type: TYPES.UnaryExpression,
@@ -80,8 +80,8 @@ describe("parseExpressionTokenStream", () => {
       });
 
       it("should parse not unary expression within call expression", () => {
-        const parsed = parse("not hello(not a)");
-        expect(parsed).toEqual({
+        const ast = parse("not hello(not a)");
+        expect(ast).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Not,
           argument: {
@@ -99,8 +99,8 @@ describe("parseExpressionTokenStream", () => {
       });
 
       it("should parse subtract unary expression", () => {
-        const parsed = parse("-1");
-        expect(parsed).toEqual({
+        const ast = parse("-1");
+        expect(ast).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Subtract,
           argument: createValue(1)
@@ -108,8 +108,8 @@ describe("parseExpressionTokenStream", () => {
       });
 
       it("should parse add unary expression", () => {
-        const parsed = parse("+foo");
-        expect(parsed).toEqual({
+        const ast = parse("+foo");
+        expect(ast).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Add,
           argument: createIdentifier("foo")
@@ -117,8 +117,8 @@ describe("parseExpressionTokenStream", () => {
       });
 
       it("should parse chained unary expression", () => {
-        const parsed = parse("not - + foo");
-        expect(parsed).toEqual({
+        const ast = parse("not - + foo");
+        expect(ast).toEqual({
           type: TYPES.UnaryExpression,
           operator: OPERATORS.Not,
           argument: {
@@ -136,8 +136,8 @@ describe("parseExpressionTokenStream", () => {
 
     describe("binary expression", () => {
       it("should parse binary expression", () => {
-        const parsed = parse("a < 1");
-        expect(parsed).toEqual({
+        const ast = parse("a < 1");
+        expect(ast).toEqual({
           type: TYPES.BinaryExpression,
           operator: OPERATORS.LessThan,
           left: createIdentifier("a"),
@@ -147,8 +147,8 @@ describe("parseExpressionTokenStream", () => {
 
       it("should parse an complex binary expression", () => {
         debugger;
-        const parsed = parse("a >= 5 and b <= 2000 or c > 5 or d < 5 ");
-        expect(parsed).toEqual({
+        const ast = parse("a >= 5 and b <= 2000 or c > 5 or d < 5 ");
+        expect(ast).toEqual({
           type: TYPES.BinaryExpression,
           operator: OPERATORS.Or,
           left: {
@@ -188,8 +188,8 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should parse chained call expression", () => {
-      const parsed = parse("hello(1)(2)(3)");
-      expect(parsed).toEqual({
+      const ast = parse("hello(1)(2)(3)");
+      expect(ast).toEqual({
         type: TYPES.CallExpression,
         callee: {
           type: TYPES.CallExpression,
@@ -205,8 +205,8 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should parse call expression", () => {
-      const parsed = parse('hello(a, "c")');
-      expect(parsed).toEqual({
+      const ast = parse('hello(a, "c")');
+      expect(ast).toEqual({
         type: TYPES.CallExpression,
         callee: createIdentifier("hello"),
         arguments: [createIdentifier("a"), createValue("c")]
@@ -214,8 +214,8 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should parse an equation expression", () => {
-      const parsed = parse("1 + 2 * 3 - -4");
-      expect(parsed).toEqual({
+      const ast = parse("1 + 2 * 3 - -4");
+      expect(ast).toEqual({
         type: TYPES.BinaryExpression,
         operator: OPERATORS.Subtract,
         left: {
@@ -238,8 +238,8 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should parse a complex expression", () => {
-      const parsed = parse("1 * +2 isnt not 3");
-      expect(parsed).toEqual({
+      const ast = parse("1 * +2 isnt not 3");
+      expect(ast).toEqual({
         type: TYPES.BinaryExpression,
         operator: OPERATORS.NotEqualTo,
         left: {
@@ -261,8 +261,8 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should work with parenthesis", () => {
-      const parsed = parse("1 * (2 + 3) / 4");
-      expect(parsed).toEqual({
+      const ast = parse("1 * (2 + 3) / 4");
+      expect(ast).toEqual({
         type: TYPES.BinaryExpression,
         operator: OPERATORS.Divide,
         left: {
@@ -281,12 +281,159 @@ describe("parseExpressionTokenStream", () => {
     });
 
     it("should work with call expression [FE-1398]", () => {
-      const parsed = parse("hello(1) / 2");
-      expect(parsed).toEqual({
+      const ast = parse("hello(1) / 2");
+      expect(ast).toEqual({
         type: TYPES.BinaryExpression,
         operator: OPERATORS.Divide,
         left: createCallExpression(createIdentifier("hello"), createValue(1)),
         right: createValue(2)
+      });
+    });
+  });
+
+  describe("should parse object expression", () => {
+    it("should parse empty object expression ", () => {
+      const ast = parse("{}");
+      expect(ast).toEqual({
+        type: TYPES.ObjectExpression,
+        properties: []
+      });
+    });
+
+    it("should parse object expression with one key", () => {
+      const stream = createExpressionTokenStream(createInputStream("{a: 1}"));
+      const ast = parse("{a: 1}");
+
+      expect(ast).toEqual({
+        type: TYPES.ObjectExpression,
+        properties: [
+          {
+            key: createIdentifier("a"),
+            value: createValue(1)
+          }
+        ]
+      });
+    });
+
+    it("should parse object expression with multiple keys", () => {
+      const ast = parse("{a: 1, 'b': 2, 1: x, d: 1 + 1}");
+      expect(ast).toEqual({
+        type: TYPES.ObjectExpression,
+        properties: [
+          {
+            key: createIdentifier("a"),
+            value: createValue(1)
+          },
+          {
+            key: createValue("b"),
+            value: createValue(2)
+          },
+          {
+            key: createValue(1),
+            value: createIdentifier("x")
+          },
+          {
+            key: createIdentifier("d"),
+            value: {
+              type: TYPES.BinaryExpression,
+              operator: OPERATORS.Add,
+              left: createValue(1),
+              right: createValue(1)
+            }
+          }
+        ]
+      });
+    });
+
+    it("should throw errors on wrong schemas", () => {
+      expect(() => parse("{a>1}")).toThrow();
+      expect(() => parse('{"a"}')).toThrow();
+      expect(() => parse("{1}")).toThrow();
+      expect(() => parse("{a}")).toThrow();
+    });
+
+    it("should parse nested object expression", () => {
+      const ast = parse("{a:{b:{c:1}, d: []}}");
+      expect(ast).toEqual({
+        type: TYPES.ObjectExpression,
+        properties: [
+          {
+            key: createIdentifier("a"),
+            value: {
+              type: TYPES.ObjectExpression,
+              properties: [
+                {
+                  key: createIdentifier("b"),
+                  value: {
+                    type: TYPES.ObjectExpression,
+                    properties: [
+                      {
+                        key: createIdentifier("c"),
+                        value: createValue(1)
+                      }
+                    ]
+                  }
+                },
+                {
+                  key: createIdentifier("d"),
+                  value: {
+                    type: TYPES.ArrayExpression,
+                    elements: []
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      });
+    });
+
+    it("should parse array expression", () => {
+      const ast = parse("['a', 'b', c, 1, [], [1], {}, 1 + 1]");
+      expect(ast).toEqual({
+        type: TYPES.ArrayExpression,
+        elements: [
+          createValue("a"),
+          createValue("b"),
+          createIdentifier("c"),
+          createValue(1),
+          {
+            type: TYPES.ArrayExpression,
+            elements: []
+          },
+          {
+            type: TYPES.ArrayExpression,
+            elements: [createValue(1)]
+          },
+          {
+            type: TYPES.ObjectExpression,
+            properties: []
+          },
+          {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.Add,
+            left: createValue(1),
+            right: createValue(1)
+          }
+        ]
+      });
+    });
+
+    it("should parse Member Expression", () => {
+      const ast = parse("a[1]()[1+1]");
+      expect(ast).toEqual({
+        type: TYPES.MemberExpression,
+        object: createCallExpression({
+          type: TYPES.MemberExpression,
+          object: createIdentifier("a"),
+          property: createValue(1)
+        }),
+        property: {
+          type: TYPES.BinaryExpression,
+          operator: OPERATORS.Add,
+          left: createValue(1),
+          right: createValue(1)
+        }
       });
     });
   });
