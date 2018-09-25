@@ -14,7 +14,7 @@ import {
 import {
   parseExpressionString,
   parseTemplateString,
-  parseDataBindingString
+  parseTwoWayBindingString
 } from "./parsers";
 import createTypeCompiler from "./typeCompiler";
 import { isVersionCompatible } from "./utils";
@@ -91,14 +91,14 @@ const getAnnotationType = key =>
 const stripAnnotation = (value, key) => {
   const strippedKey = key.substring(1, key.length - 1);
   switch (getAnnotationType(key)) {
-    case ANNOTATION_TYPES.DataBinding:
-    case ANNOTATION_TYPES.Expression:
+    case ANNOTATION_TYPES.TwoWayBinding:
+    case ANNOTATION_TYPES.PropertyBinding:
     case ANNOTATION_TYPES.Template:
     case ANNOTATION_TYPES.Component:
       // only strip annotation when there is one
       // convert [value] to value
       return strippedKey;
-    case ANNOTATION_TYPES.Action:
+    case ANNOTATION_TYPES.EventBinding:
       // convert (click) to onClick
       return `on${strippedKey[0].toUpperCase()}${strippedKey.substr(1)}`;
     default:
@@ -115,13 +115,13 @@ const stripAnnotation = (value, key) => {
  */
 const compileValue = curry((options, value, key) => {
   switch (getAnnotationType(key)) {
-    case ANNOTATION_TYPES.Action:
+    case ANNOTATION_TYPES.EventBinding:
       return parseExpressionString(value);
-    case ANNOTATION_TYPES.Expression:
+    case ANNOTATION_TYPES.PropertyBinding:
       // todo support object
       return parseExpressionString(value);
-    case ANNOTATION_TYPES.DataBinding:
-      return parseDataBindingString(value);
+    case ANNOTATION_TYPES.TwoWayBinding:
+      return parseTwoWayBindingString(value);
     case ANNOTATION_TYPES.Template:
       return parseTemplateString(value);
     case ANNOTATION_TYPES.Component:

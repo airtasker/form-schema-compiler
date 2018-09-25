@@ -114,21 +114,21 @@ describe("compileComponents", () => {
     it("Should compile expression props", () => {
       expect(
         compileProps({
-          "[dataBinding]": "a",
-          "{exp}": "b",
-          "(action)": "c",
+          "[twoWayBinding]": "a",
+          "{propertyBinding}": "b",
+          "(event)": "c",
           "#template#": "a+d"
         })
       ).toEqual({
-        dataBinding: {
+        twoWayBinding: {
           type: TYPES.Identifier,
           name: "a"
         },
-        exp: {
+        propertyBinding: {
           type: TYPES.Identifier,
           name: "b"
         },
-        onAction: {
+        onEvent: {
           type: TYPES.Identifier,
           name: "c"
         },

@@ -83,19 +83,19 @@ export const PUNCTUATIONS = {
 };
 
 export const ANNOTATION_TYPES = {
-  Expression: "Expression",
+  PropertyBinding: "PropertyBinding",
   Template: "Template",
   Component: "Component",
-  Action: "Action",
-  DataBinding: "DataBinding"
+  EventBinding: "EventBinding",
+  TwoWayBinding: "TwoWayBinding"
 };
 
 export const ANNOTATIONS = {
-  [ANNOTATION_TYPES.Expression]: ["{", "}"],
+  [ANNOTATION_TYPES.PropertyBinding]: ["{", "}"],
   [ANNOTATION_TYPES.Template]: ["#", "#"],
   [ANNOTATION_TYPES.Component]: ["<", ">"],
-  [ANNOTATION_TYPES.Action]: ["(", ")"],
-  [ANNOTATION_TYPES.DataBinding]: ["[", "]"]
+  [ANNOTATION_TYPES.EventBinding]: ["(", ")"],
+  [ANNOTATION_TYPES.TwoWayBinding]: ["[", "]"]
 };
 
 export const GLOBAL_FUNCTIONS = {

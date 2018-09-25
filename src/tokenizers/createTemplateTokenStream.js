@@ -18,8 +18,8 @@ import createExpressionTokenStream from "./createExpressionTokenStream";
  * @returns {{next: (function(): Object), peek: (function(): Object), eof: (function(): boolean), croak: (function(*)), position: (function(): {pos: number, line: number, col: number})}}
  */
 const createTemplateTokenStream = inputStream => {
-  const isBracketStart = ch => ch === ANNOTATIONS.Expression[0];
-  const isBracketEnd = ch => ch === ANNOTATIONS.Expression[1];
+  const isBracketStart = ch => ch === PUNCTUATIONS.Braces[0];
+  const isBracketEnd = ch => ch === PUNCTUATIONS.Braces[1];
   let state;
   const tokenStacks = [];
 

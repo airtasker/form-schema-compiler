@@ -25,11 +25,11 @@ export const parseExpressionString = (expressionString) =>
   );
 
 /**
- * parse data binding string
- * Will throw error if dataBinding string is not a identifier.
+ * parse two way binding string
+ * Will throw error if TwoWayBinding is not a identifier.
  * @param expressionString
  */
-export const parseDataBindingString = (expressionString) => {
+export const parseTwoWayBindingString = (expressionString) => {
   const parsed = parseExpressionTokenStream(
     createExpressionTokenStream(createInputStream(expressionString)),
   );
