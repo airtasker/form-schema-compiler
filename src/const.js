@@ -7,6 +7,7 @@ export const TYPES = {
   Null: "Null",
   RegExp: "RegExp",
   Identifier: "Identifier",
+  AssignExpression: "AssignExpression",
   ObjectExpression: "ObjectExpression",
   ObjectProperty: "ObjectProperty",
   ArrayExpression: "ArrayExpression",
@@ -33,11 +34,13 @@ export const EXPRESSIONS = [
   TYPES.ObjectExpression,
   TYPES.ArrayExpression,
   TYPES.BinaryExpression,
+  TYPES.AssignExpression,
   TYPES.CallExpression,
   TYPES.UnaryExpression
 ];
 
 export const OPERATORS = {
+  Assign: "=",
   Add: "+",
   Subtract: "-",
   Multiply: "*",
@@ -103,4 +106,4 @@ export const GLOBAL_FUNCTIONS = {
 };
 
 // [minimum version, maximum version]
-export const COMPATIBLE_SCHEMA_VERSION = ["0.0.16", "0.0.16"];
+export const COMPATIBLE_SCHEMA_VERSION = ["0.0.17", "0.0.17"];

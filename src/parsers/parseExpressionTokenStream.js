@@ -138,7 +138,7 @@ const parseExpressionTokenStream = tokenStream => {
         tokenStream.next();
         const right = maybeBinary(parseAtom(), rightOpPrec);
         const binary = {
-          type: TYPES.BinaryExpression,
+          type: token.value === OPERATORS.Assign ? TYPES.AssignExpression : TYPES.BinaryExpression,
           operator: token.value,
           left,
           right
