@@ -106,4 +106,4 @@ export const GLOBAL_FUNCTIONS = {
 };
 
 // [minimum version, maximum version]
-export const COMPATIBLE_SCHEMA_VERSION = ["0.0.17", "0.0.17"];
+export const COMPATIBLE_SCHEMA_VERSION = ["0.0.16", "0.0.17"];
