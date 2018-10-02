@@ -1,22 +1,18 @@
-import { TYPES } from "./../const";
-import apply from "./apply";
+import { TYPES } from "../const";
+import evaluate from "./evaluate";
 import { parseExpressionString } from "../parsers";
+import Environment from "./Environment";
 
-const applyWithStringExpression = (str, options) => {
+const evaluateWithStringExpression = (str, env) => {
   const ast = parseExpressionString(str);
-  return apply(ast, options);
+  return evaluate(ast, env);
 };
 
-describe("interpreter apply()", () => {
-  let options;
+describe("interpreter evaluate()", () => {
+  let env;
 
   beforeEach(() => {
-    const variableGetter = jest.fn();
-    const applyComponents = jest.fn();
-    options = {
-      variableGetter,
-      applyComponents
-    };
+    env = new Environment();
   });
 
   [
@@ -78,32 +74,32 @@ describe("interpreter apply()", () => {
     }
   ].forEach(data => {
     it(data.title, () => {
-      expect(applyWithStringExpression(data.given, options)).toEqual(
+      expect(evaluateWithStringExpression(data.given, env)).toEqual(
         data.expect
       );
     });
   });
 
   it("should support identity", () => {
-    options.variableGetter.mockReturnValue("bar");
-    expect(applyWithStringExpression("foo", options)).toEqual("bar");
-    expect(options.variableGetter).toHaveBeenCalledWith("foo");
+    env.get = jest.fn().mockReturnValue("bar");
+    expect(evaluateWithStringExpression("foo", env)).toEqual("bar");
+    expect(env.get).toHaveBeenCalledWith("foo");
   });
 
   it("should support components", () => {
-    options.applyComponents.mockReturnValue("returnValue");
+    env.evaluateComponents = jest.fn().mockReturnValue("returnValue");
     expect(
-      apply(
+      evaluate(
         {
           type: TYPES.Components,
           components: [],
           a: 1,
           b: 2
         },
-        options
+        env
       )
     ).toEqual("returnValue");
-    expect(options.applyComponents).toHaveBeenCalledWith({
+    expect(env.evaluateComponents).toHaveBeenCalledWith({
       components: [],
       a: 1,
       b: 2
@@ -111,25 +107,24 @@ describe("interpreter apply()", () => {
   });
 
   it("should support function call", () => {
-    options.variableGetter
+    env.get = jest
+      .fn()
       .mockReturnValueOnce(str => str)
       .mockReturnValueOnce("world");
 
-    expect(applyWithStringExpression('whatAmISay("world")', options)).toEqual(
+    expect(evaluateWithStringExpression('whatAmISay("world")', env)).toEqual(
       "world"
     );
-    expect(options.variableGetter).toHaveBeenCalled();
+    expect(env.get).toHaveBeenCalled();
   });
 
   it("should support Object", () => {
-    expect(applyWithStringExpression("{}", options)).toEqual({});
-
-    options.variableGetter.mockReturnValueOnce("d");
-
+    expect(evaluateWithStringExpression("{}", env)).toEqual({});
+    env.set("c", "d");
     expect(
-      applyWithStringExpression(
+      evaluateWithStringExpression(
         '{"a": 1, "b": {}, c: 1 + 2, "e": "hello"}',
-        options
+        env
       )
     ).toEqual({
       a: 1,
@@ -140,19 +135,19 @@ describe("interpreter apply()", () => {
   });
 
   it("should support Array", () => {
-    expect(applyWithStringExpression("[]", options)).toEqual([]);
+    expect(evaluateWithStringExpression("[]", env)).toEqual([]);
 
-    options.variableGetter.mockReturnValueOnce("c");
-    expect(
-      applyWithStringExpression('["a", b, 3, {}, 1 + 1]', options)
-    ).toEqual(["a", "c", 3, {}, 2]);
+    env.set("b", "c");
+    expect(evaluateWithStringExpression('["a", b, 3, {}, 1 + 1]', env)).toEqual(
+      ["a", "c", 3, {}, 2]
+    );
   });
 
   it("should support MemberObject", () => {
-    options.variableGetter.mockReturnValueOnce([0]);
-    expect(applyWithStringExpression("a[0]", options)).toBe(0);
+    env.set("a", [0]);
+    expect(evaluateWithStringExpression("a[0]", env)).toBe(0);
 
-    options.variableGetter.mockReturnValueOnce({ a: 1 });
-    expect(applyWithStringExpression("a['a']", options)).toBe(1);
+    env.set("a", { a: 1 });
+    expect(evaluateWithStringExpression("a['a']", env)).toBe(1);
   });
 });

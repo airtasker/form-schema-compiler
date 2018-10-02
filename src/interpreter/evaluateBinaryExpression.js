@@ -8,7 +8,7 @@ const handleRegex = (left, operator, right) => {
   return regex.test(left);
 };
 
-export const evalBinaryExpression = ({ operator, left, right }) => {
+export const evaluateNonBranchableBinaryExpression = ({ operator, left, right }) => {
   switch (operator) {
     case OPERATORS.LessThan:
       return left < right;
@@ -41,22 +41,22 @@ export const evalBinaryExpression = ({ operator, left, right }) => {
   }
 };
 
-const applyBinaryExpression = ({ operator, left, right }, { apply }) => {
+const evaluateBinaryExpression = ({ operator, left, right }, env, evaluate) => {
   switch (operator) {
     // specially handling for OR and AND
     case OPERATORS.Or:
       // if left is true will ignore right
-      return apply(left) || apply(right);
+      return evaluate(left, env) || evaluate(right, env);
     case OPERATORS.And:
       // if left is false will ignore right
-      return apply(left) && apply(right);
+      return evaluate(left, env) && evaluate(right, env);
     default:
-      return evalBinaryExpression({
+      return evaluateNonBranchableBinaryExpression({
         operator,
-        left: apply(left),
-        right: apply(right)
+        left: evaluate(left, env),
+        right: evaluate(right, env)
       });
   }
 };
 
-export default applyBinaryExpression;
+export default evaluateBinaryExpression;

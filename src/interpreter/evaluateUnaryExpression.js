@@ -1,13 +1,13 @@
 import { OPERATORS } from "../const";
 
-const applyUnaryExpression = ({ operator, argument }, { apply }) => {
+const evaluateUnaryExpression = ({ operator, argument }, env, evaluate) => {
   switch (operator) {
     case OPERATORS.Not:
-      return !apply(argument);
+      return !evaluate(argument, env);
     case OPERATORS.Add:
-      return +apply(argument);
+      return +evaluate(argument, env);
     case OPERATORS.Subtract:
-      return -apply(argument);
+      return -evaluate(argument, env);
     default:
       throw new Error(
         `wrong UnaryExpression ${JSON.stringify({ operator, argument })}`
@@ -15,4 +15,4 @@ const applyUnaryExpression = ({ operator, argument }, { apply }) => {
   }
 };
 
-export default applyUnaryExpression;
+export default evaluateUnaryExpression;
