@@ -10,7 +10,8 @@ const operatorChars = [
   OPERATORS.Add,
   OPERATORS.Subtract,
   OPERATORS.Multiply,
-  OPERATORS.Divide
+  OPERATORS.Divide,
+  OPERATORS.Assign
 ];
 export const isOperatorChar = ch => operatorChars.includes(ch);
 export const isNull = str => str === "null";

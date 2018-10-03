@@ -1,6 +1,7 @@
 import { TYPES } from "../const";
 import evaluateIdentifier from "./evaluateIdentifier";
 import evaluateUnaryExpression from "./evaluateUnaryExpression";
+import evaluateAssignExpression from "./evaluateAssignExpression";
 import evaluateBinaryExpression from "./evaluateBinaryExpression";
 import evaluateCallExpression from "./evaluateCallExpression";
 import evaluateMemberObjectExpression from "./evaluateMemberObjectExpression";
@@ -23,6 +24,7 @@ const TypeHandlers = {
   [TYPES.RegExp]: toRegExp,
   [TYPES.Identifier]: evaluateIdentifier,
   [TYPES.UnaryExpression]: evaluateUnaryExpression,
+  [TYPES.AssignExpression]: evaluateAssignExpression,
   [TYPES.BinaryExpression]: evaluateBinaryExpression,
   [TYPES.CallExpression]: evaluateCallExpression,
   [TYPES.Components]: evaluateComponents,

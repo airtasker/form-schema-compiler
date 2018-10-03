@@ -134,11 +134,17 @@ const parseExpressionTokenStream = tokenStream => {
     const token = isOperator();
     if (token) {
       const rightOpPrec = PRECEDENCE[token.value];
+      const isAssign = token.value === OPERATORS.Assign;
       if (rightOpPrec > leftOpPrec) {
+        if (isAssign && left.type !== TYPES.Identifier) {
+          tokenStream.croak(
+            `You can only assign to an identifier "${JSON.stringify(left)}"`
+          );
+        }
         tokenStream.next();
         const right = maybeBinary(parseAtom(), rightOpPrec);
         const binary = {
-          type: token.value === OPERATORS.Assign ? TYPES.AssignExpression : TYPES.BinaryExpression,
+          type: isAssign ? TYPES.AssignExpression : TYPES.BinaryExpression,
           operator: token.value,
           left,
           right

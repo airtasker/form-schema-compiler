@@ -12,6 +12,7 @@ export default class Environment {
 
     set(name, value = null) {
         this.vars[name] = value;
+        return value; //  return value because assignment should return value e.g (a = 1)
     }
 
     evaluateComponents(ast) {

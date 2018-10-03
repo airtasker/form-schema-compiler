@@ -59,6 +59,7 @@ export const OPERATORS = {
 };
 
 export const PRECEDENCE = {
+  [OPERATORS.Assign]: 1,
   [OPERATORS.Or]: 2,
   [OPERATORS.And]: 3,
   [OPERATORS.GreaterThan]: 7,

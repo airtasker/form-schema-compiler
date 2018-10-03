@@ -135,6 +135,16 @@ describe("parseExpressionTokenStream", () => {
     });
 
     describe("binary expression", () => {
+      it("should parse assign expression", () => {
+        const ast = parse("a = 1");
+        expect(ast).toEqual({
+          type: TYPES.AssignExpression,
+          operator: OPERATORS.Assign,
+          left: createIdentifier("a"),
+          right: createValue(1)
+        });
+      });
+      
       it("should parse binary expression", () => {
         const ast = parse("a < 1");
         expect(ast).toEqual({

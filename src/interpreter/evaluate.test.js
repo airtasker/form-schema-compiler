@@ -80,9 +80,14 @@ describe("interpreter evaluate()", () => {
     });
   });
 
+  it("should support assign", () => {
+    expect(evaluateWithStringExpression("a = 1", env)).toBe(1);
+    expect(env.get("a")).toBe(1);
+  });
+
   it("should support identity", () => {
     env.get = jest.fn().mockReturnValue("bar");
-    expect(evaluateWithStringExpression("foo", env)).toEqual("bar");
+    expect(evaluateWithStringExpression("foo", env)).toBe("bar");
     expect(env.get).toHaveBeenCalledWith("foo");
   });
 
@@ -98,7 +103,7 @@ describe("interpreter evaluate()", () => {
         },
         env
       )
-    ).toEqual("returnValue");
+    ).toBe("returnValue");
     expect(env.evaluateComponents).toHaveBeenCalledWith({
       components: [],
       a: 1,
@@ -112,7 +117,7 @@ describe("interpreter evaluate()", () => {
       .mockReturnValueOnce(str => str)
       .mockReturnValueOnce("world");
 
-    expect(evaluateWithStringExpression('whatAmISay("world")', env)).toEqual(
+    expect(evaluateWithStringExpression('whatAmISay("world")', env)).toBe(
       "world"
     );
     expect(env.get).toHaveBeenCalled();
