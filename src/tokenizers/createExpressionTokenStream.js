@@ -3,19 +3,26 @@ import { OPERATORS, PUNCTUATIONS } from "./../const";
 import * as utils from "./utils";
 import { BOOLEANS, TYPES } from "../const";
 
-const defaultShouldEnd = () => false;
+const defaultShouldEnd = inputStream => inputStream.eof();
 
 /**
  * transpiling expression string input to an expression token stream
  * e.g "a" to {type: identifier, name: 'a'}
  * more example see tests
- * @param inputStream: InputStream
+ * @param {{next, peek, croak}}: inputStream
+ * @param {Function}: shouldEnd
+ * @param {{eof}}: shouldEnd
  * @returns {{next: (function(): Object), peek: (function(): Object), eof: (function(): boolean), croak: (function(*)), position: (function(): {pos: number, line: number, col: number})}}
  */
 const createExpressionTokenStream = (
   inputStream,
-  shouldEnd = defaultShouldEnd
+  shouldEnd = defaultShouldEnd,
+  errors = {
+    eof: "Not expect input ended at time"
+  }
 ) => {
+  let isStringTemplateMode = false;
+
   const readNumber = () => {
     let hasDot = false;
     const number = utils.readWhile(inputStream, ch => {
@@ -97,10 +104,77 @@ const createExpressionTokenStream = (
     };
   };
 
-  const readString = ch => ({
-    type: TYPES.String,
-    value: utils.readEscaped(inputStream, c => c === ch)
-  });
+  const readString = ch => {
+    inputStream.next();
+    const ast = {
+      type: TYPES.String,
+      value: utils.readEscaped(inputStream, c => c === ch)
+    };
+    inputStream.next();
+    return ast;
+  };
+
+  let stringTemplateExpressionSteam = null;
+  const initStringTemplateMode = () => {
+    stringTemplateExpressionSteam = null;
+    isStringTemplateMode = true;
+  };
+
+  const readTemplateLiteral = () => {
+    let ch = inputStream.peek();
+
+    if (inputStream.eof()) {
+      inputStream.croak(`String template does not end`);
+    }
+
+    if (stringTemplateExpressionSteam) {
+      if (stringTemplateExpressionSteam.eof()) {
+        stringTemplateExpressionSteam = null;
+        return {
+          type: TYPES.Punctuation,
+          value: inputStream.next()
+        };
+      }
+      return stringTemplateExpressionSteam.next();
+    }
+
+    if (utils.isBackQuote(ch)) {
+      isStringTemplateMode = false;
+      return {
+        type: TYPES.Punctuation,
+        value: inputStream.next()
+      };
+    }
+
+    if (utils.isBraceStart(ch)) {
+      const ast = {
+        type: TYPES.Punctuation,
+        value: inputStream.next()
+      };
+      stringTemplateExpressionSteam = createExpressionTokenStream(
+        inputStream,
+        (stream, c) => utils.isBraceEnd(c),
+        {
+          eof: 'String Template expression missing a "}"'
+        }
+      );
+      if (stringTemplateExpressionSteam.eof()) {
+        inputStream.croak(
+          "Unexpected empty expression in string template e.g {}"
+        );
+      }
+      return ast;
+    }
+
+    // must be string
+    return {
+      type: TYPES.String,
+      value: utils.readEscaped(
+        inputStream,
+        c => utils.isBraceStart(c) || utils.isBackQuote(c)
+      )
+    };
+  };
 
   const readOperator = () => {
     let value = inputStream.next();
@@ -122,7 +196,7 @@ const createExpressionTokenStream = (
   // eslint-disable-next-line no-use-before-define
   const { peek, next, queue } = utils.createPeekAndNext(readNext, 1);
 
-  const regexpPreviousTokens = [
+  const regexpLeadingTokens = [
     {
       type: TYPES.Punctuation,
       value: PUNCTUATIONS.Parentheses[0]
@@ -140,14 +214,18 @@ const createExpressionTokenStream = (
   // check previous token if read /
   // if previous token is number or string or identifier it's must be division instead of a start of regex
   const canBeRegexp = () =>
-    queue.length === 0 || find(regexpPreviousTokens, queue[0]) !== undefined;
+    queue.length === 0 || find(regexpLeadingTokens, queue[0]) !== undefined;
 
   // eslint-disable-next-line consistent-return
   function readNext() {
     utils.readWhile(inputStream, utils.isWhitespace);
 
     const ch = inputStream.peek();
-    if (inputStream.eof() || shouldEnd(ch)) {
+    if (isStringTemplateMode) {
+      return readTemplateLiteral();
+    }
+
+    if (shouldEnd(inputStream, ch)) {
       return null;
     }
     if (ch === "#") {
@@ -170,6 +248,15 @@ const createExpressionTokenStream = (
       // when read a char is > or < means this possibly a >= or <=
       return readOperator();
     }
+
+    if (utils.isBackQuote(ch)) {
+      initStringTemplateMode();
+      return {
+        type: TYPES.Punctuation,
+        value: inputStream.next()
+      };
+    }
+
     if (utils.isPunctuation(ch)) {
       return {
         type: TYPES.Punctuation,
@@ -182,7 +269,12 @@ const createExpressionTokenStream = (
         value: inputStream.next()
       };
     }
-    inputStream.croak(`Can't handle character: "${ch}"`);
+
+    if (inputStream.eof()) {
+      inputStream.croak(errors.eof);
+    } else {
+      inputStream.croak(`Can't handle character: "${ch}"`);
+    }
   }
 
   const eof = () => peek() === null;

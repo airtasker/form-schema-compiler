@@ -37,6 +37,8 @@ export const isStringStart = ch => ch === "'" || ch === '"';
 const whitespaceChars = " \t\n\r";
 export const isWhitespace = ch => whitespaceChars.includes(ch);
 
+export const isBackQuote = ch => ch === PUNCTUATIONS.BackQuote;
+
 /**
  * concat input stream chunk until a failure predicate
  * @param inputStream
@@ -60,25 +62,27 @@ export const readWhile = (inputStream, predicate) => {
 export const readEscaped = (inputStream, shouldStop) => {
   let escaped = false;
   let str = "";
-  inputStream.next();
+  let stringEnded = false;
   while (!inputStream.eof()) {
-    const ch = inputStream.next();
+    const ch = inputStream.peek();
     if (escaped) {
       str += ch;
       escaped = false;
     } else if (ch === "\\") {
       escaped = true;
     } else if (shouldStop(ch)) {
-      break;
+      return str;
     } else {
       str += ch;
     }
+    inputStream.next();
   }
-  return str;
+  
+  inputStream.croak('input stream ended with no close string');
 };
 
 /**
- * concat input stream chunk until a truthy shouldStop.
+ * concat input stream chunk until shouldStop() return true.
  * Will not check a char next to '\'
  * @param inputStream
  * @param shouldStop(char) callback return concatenation if true
@@ -112,6 +116,9 @@ export const readWhileWithEscaped = (
   }
   return str;
 };
+
+export const isBraceStart = ch => ch === PUNCTUATIONS.Braces[0];
+export const isBraceEnd = ch => ch === PUNCTUATIONS.Braces[1];
 
 /**
  * peek, next, queue
@@ -157,3 +164,6 @@ export const createPeekAndNext = (nextFn, queueSize = 0) => {
     queue
   };
 };
+
+
+ 

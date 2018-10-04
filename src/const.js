@@ -14,12 +14,16 @@ export const TYPES = {
   BinaryExpression: "BinaryExpression",
   UnaryExpression: "UnaryExpression",
   CallExpression: "CallExpression",
+  TemplateLiteral: "TemplateLiteral",
   MemberExpression: "MemberExpression",
   Components: "Components",
   Operator: "Operator",
   Punctuation: "Punctuation",
   Raw: "Raw"
 };
+
+/**
+those const not used in the app, leave here for reference
 
 export const PRIMITIVES = [
   TYPES.Numeric,
@@ -36,8 +40,11 @@ export const EXPRESSIONS = [
   TYPES.BinaryExpression,
   TYPES.AssignExpression,
   TYPES.CallExpression,
-  TYPES.UnaryExpression
+  TYPES.UnaryExpression,
+  TYPES.TemplateLiteral,
 ];
+
+ */
 
 export const OPERATORS = {
   Assign: "=",
@@ -83,7 +90,8 @@ export const PUNCTUATIONS = {
   SquareBrackets: ["[", "]"],
   Parentheses: ["(", ")"],
   Separator: ",",
-  Colon: ":"
+  Colon: ":",
+  BackQuote: "`"
 };
 
 export const ANNOTATION_TYPES = {

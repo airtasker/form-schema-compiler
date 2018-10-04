@@ -74,6 +74,14 @@ describe("createExpressionTokenStream", () => {
 
       expect(stream.next()).toEqual(createValue("asdf\\"));
     });
+
+    it("should throw error when it's not valid", () => {
+      let stream = create("'asdfasdf");
+      expect(() => stream.next()).toThrow();
+
+      stream = create('"asdfasdf');
+      expect(() => stream.next()).toThrow();
+    });
   });
 
   describe("should recognize regexp", () => {
@@ -223,6 +231,85 @@ describe("createExpressionTokenStream", () => {
     expect(stream.next()).toEqual({
       type: TYPES.Operator,
       value: "/"
+    });
+  });
+
+  describe("string template literal", () => {
+    it("should support empty template literal", () => {
+      const stream = create("``");
+
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.eof()).toBeTruthy();
+    });
+
+    it("should support complex template literal", () => {
+      const stream = create("`'\"foo\"'{`1{1}`}bar`");
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.String,
+        value: `'"foo"'`
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "{"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.String,
+        value: `1`
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "{"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Numeric,
+        value: 1
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "}"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "}"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.String,
+        value: `bar`
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.eof()).toBeTruthy();
+    });
+
+    it("should throw error when it's not valid", () => {
+      let stream = create("`{}`");
+      stream.next();
+      expect(() => stream.next()).toThrow();
+
+      stream = create("`1");
+      stream.next();
+      expect(() => stream.next()).toThrow();
     });
   });
 });
