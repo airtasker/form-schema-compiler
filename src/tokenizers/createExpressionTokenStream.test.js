@@ -255,10 +255,7 @@ describe("createExpressionTokenStream", () => {
         type: TYPES.Punctuation,
         value: "`"
       });
-      expect(stream.next()).toEqual({
-        type: TYPES.String,
-        value: `'"foo"'`
-      });
+      expect(stream.next()).toEqual(createValue(`'"foo"'`));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "{"
@@ -267,18 +264,12 @@ describe("createExpressionTokenStream", () => {
         type: TYPES.Punctuation,
         value: "`"
       });
-      expect(stream.next()).toEqual({
-        type: TYPES.String,
-        value: `1`
-      });
+      expect(stream.next()).toEqual(createValue(`1`));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "{"
       });
-      expect(stream.next()).toEqual({
-        type: TYPES.Numeric,
-        value: 1
-      });
+      expect(stream.next()).toEqual(createValue(1));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "}"
@@ -291,10 +282,7 @@ describe("createExpressionTokenStream", () => {
         type: TYPES.Punctuation,
         value: "}"
       });
-      expect(stream.next()).toEqual({
-        type: TYPES.String,
-        value: `bar`
-      });
+      expect(stream.next()).toEqual(createValue("bar"));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "`"
