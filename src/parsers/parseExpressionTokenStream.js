@@ -236,6 +236,39 @@ const parseExpressionTokenStream = tokenStream => {
     };
   }
 
+  function checkIfNeedAddDummyQuasis(expressions, quasis) {
+    if (quasis.length <= expressions.length) {
+      quasis.push({
+        type: TYPES.String,
+        value: ""
+      });
+    }
+  }
+
+  function parseTemplateLiteral() {
+    skipPunctuation(PUNCTUATIONS.BackQuote);
+    const expressions = [];
+    const quasis = [];
+
+    while (!isPunctuation(PUNCTUATIONS.BackQuote)) {
+      if (isPunctuation(PUNCTUATIONS.Braces[0])) {
+        skipPunctuation(PUNCTUATIONS.Braces[0]);
+        checkIfNeedAddDummyQuasis(expressions, quasis);
+        expressions.push(parseExpression());
+        skipPunctuation(PUNCTUATIONS.Braces[1]);
+      } else {
+        quasis.push(tokenStream.next());
+      }
+    }
+    checkIfNeedAddDummyQuasis(expressions, quasis);
+    skipPunctuation(PUNCTUATIONS.BackQuote);
+    return {
+      type: TYPES.TemplateLiteral,
+      expressions,
+      quasis
+    };
+  }
+
   /**
    * parse next expression
    * @returns {Expression}
@@ -258,7 +291,7 @@ const parseExpressionTokenStream = tokenStream => {
    */
   function parseSimpleAtom() {
     if (isPunctuation(PUNCTUATIONS.Parentheses[0])) {
-      // if read parentheses, then will parse the expression inside the parentheses
+      // if it reads parentheses, then will parse the expression inside the parentheses
       tokenStream.next();
       const exp = parseExpression();
       skipPunctuation(PUNCTUATIONS.Parentheses[1]);
@@ -266,13 +299,18 @@ const parseExpressionTokenStream = tokenStream => {
     }
 
     if (isPunctuation(PUNCTUATIONS.Braces[0])) {
-      // if read braces start, then it's an Object
+      // if it reads braces start, then it's an Object
       return parseObject();
     }
 
     if (isPunctuation(PUNCTUATIONS.SquareBrackets[0])) {
-      // if read square brackets start, then it's an Array
+      // if it reads square brackets start, then it's an Array
       return parseArray();
+    }
+
+    if (isPunctuation(PUNCTUATIONS.BackQuote)) {
+      // if it reads back quote, then it's a Template Literal
+      return parseTemplateLiteral();
     }
 
     const token = tokenStream.next();

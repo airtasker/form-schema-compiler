@@ -144,7 +144,7 @@ describe("parseExpressionTokenStream", () => {
           right: createValue(1)
         });
       });
-      
+
       it("should parse binary expression", () => {
         const ast = parse("a < 1");
         expect(ast).toEqual({
@@ -444,6 +444,49 @@ describe("parseExpressionTokenStream", () => {
           left: createValue(1),
           right: createValue(1)
         }
+      });
+    });
+  });
+
+  describe("template literal", () => {
+    it("should parse empty template literal", () => {
+      const ast = parse("``");
+      expect(ast).toEqual({
+        type: TYPES.TemplateLiteral,
+        expressions: [],
+        quasis: [createValue("")]
+      });
+    });
+
+    it("should parse template literal leading and ending with expression", () => {
+      const ast = parse("`{a}`");
+      expect(ast).toEqual({
+        type: TYPES.TemplateLiteral,
+        expressions: [createIdentifier("a")],
+        quasis: [createValue(""), createValue("")]
+      });
+    });
+
+    it("should parse complex template literal", () => {
+      const ast = parse("`foo{`hello{a + b}world`}bar{foo(1)}`");
+      expect(ast).toEqual({
+        type: TYPES.TemplateLiteral,
+        expressions: [
+          {
+            type: TYPES.TemplateLiteral,
+            expressions: [
+              {
+                type: TYPES.BinaryExpression,
+                operator: OPERATORS.Add,
+                left: createIdentifier("a"),
+                right: createIdentifier("b")
+              }
+            ],
+            quasis: [createValue("hello"), createValue("world")]
+          },
+          createCallExpression(createIdentifier("foo"), createValue(1))
+        ],
+        quasis: [createValue("foo"), createValue("bar"), createValue("")]
       });
     });
   });
