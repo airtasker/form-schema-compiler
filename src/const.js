@@ -110,9 +110,5 @@ export const ANNOTATIONS = {
   [ANNOTATION_TYPES.TwoWayBinding]: ["[", "]"]
 };
 
-export const GLOBAL_FUNCTIONS = {
-  toString: "toString"
-};
-
 // [minimum version, maximum version]
 export const COMPATIBLE_SCHEMA_VERSION = ["0.0.16", "0.0.17"];

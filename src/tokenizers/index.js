@@ -4,6 +4,3 @@ export {
 
 export { default as createInputStream } from './createInputStream';
 
-export {
-  default as createTemplateTokenStream,
-} from './createTemplateTokenStream';

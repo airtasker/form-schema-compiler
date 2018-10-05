@@ -133,8 +133,9 @@ describe("compileComponents", () => {
           name: "c"
         },
         template: {
-          type: TYPES.String,
-          value: "a+d"
+          type: "TemplateLiteral",
+          expressions: [],
+          quasis: [{ type: "String", value: "a+d" }]
         }
       });
     });
