@@ -250,12 +250,12 @@ describe("createExpressionTokenStream", () => {
     });
 
     it("should support complex template literal", () => {
-      const stream = create("`'\"foo\"'{`1{1}`}bar`");
+      const stream = create("`'\"foo\"'\\{\\`{`1{1}`}bar`");
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "`"
       });
-      expect(stream.next()).toEqual(createValue(`'"foo"'`));
+      expect(stream.next()).toEqual(createValue(`'"foo"'{\``));
       expect(stream.next()).toEqual({
         type: TYPES.Punctuation,
         value: "{"
