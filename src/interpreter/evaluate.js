@@ -7,6 +7,7 @@ import evaluateCallExpression from "./evaluateCallExpression";
 import evaluateMemberObjectExpression from "./evaluateMemberObjectExpression";
 import evaluateObjectExpression from "./evaluateObjectExpression";
 import evaluateArrayExpression from "./evaluateArrayExpression";
+import evaluateTemplateLiteral from "./evaluateTemplateLiteral";
 import { hasKey } from "../utils";
 import Environment from "./Environment";
 
@@ -30,7 +31,8 @@ const TypeHandlers = {
   [TYPES.Components]: evaluateComponents,
   [TYPES.MemberExpression]: evaluateMemberObjectExpression,
   [TYPES.ObjectExpression]: evaluateObjectExpression,
-  [TYPES.ArrayExpression]: evaluateArrayExpression
+  [TYPES.ArrayExpression]: evaluateArrayExpression,
+  [TYPES.TemplateLiteral]: evaluateTemplateLiteral
 };
 
 /**
@@ -53,9 +55,7 @@ const evaluate = ({ type, ...ast }, environment) => {
  * @returns {*}
  */
 const evaluateWithEnvironmentCheck = (ast, environment) => {
-  if (
-    !(environment instanceof Environment)
-  ) {
+  if (!(environment instanceof Environment)) {
     throw new Error(`Can't evaluate without a proper Environment instance`);
   }
   return evaluate(ast, environment);

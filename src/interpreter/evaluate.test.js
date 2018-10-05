@@ -155,4 +155,12 @@ describe("interpreter evaluate()", () => {
     env.set("a", { a: 1 });
     expect(evaluateWithStringExpression("a['a']", env)).toBe(1);
   });
+
+  it("should support TemplateLiteral", () => {
+    env.set("world", "world");
+    env.set("foo", () => 'bar');
+    expect(evaluateWithStringExpression("`hello {world}, {`foo`}{foo()}`", env)).toBe(
+      "hello world, foobar"
+    );
+  });
 });
