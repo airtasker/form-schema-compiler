@@ -285,6 +285,35 @@ const parseExpressionTokenStream = tokenStream => {
     return maybeUnary(() => maybeCallOrMember(parseSimpleAtom()));
   }
 
+  function parseProgram() {
+    const body = [];
+    while (!tokenStream.eof()) {
+      body.push(parseExpression());
+      if (tokenStream.eof()) {
+        // skip semi colon check if tokenStream is end;
+        break;
+      }
+      skipPunctuation(PUNCTUATIONS.SemiColon);
+    }
+    return {
+      type: TYPES.Program,
+      body,
+    }
+  }
+
+  function parseBlockStatement() {
+    return {
+      type: TYPES.BlockStatement,
+      callee,
+      arguments: delimited(
+        PUNCTUATIONS.Braces[0], // {
+        PUNCTUATIONS.Braces[1], // }
+        PUNCTUATIONS.SemiColon, // ;
+        parseExpression
+      )
+    };
+  }
+
   /**
    * parse a simple atom, e.g identifier, number, string, object, array, boolean, etc
    * @returns {Expression}
@@ -327,7 +356,7 @@ const parseExpressionTokenStream = tokenStream => {
     );
   }
 
-  return parseExpression();
+  return parseProgram();
 };
 
 export default parseExpressionTokenStream;

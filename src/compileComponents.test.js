@@ -1,5 +1,6 @@
 import { compileComponents, compileProps } from "./compileComponents";
 import { TYPES } from "./const";
+import { createValue, createIdentifier, createProgram } from "./utils";
 
 describe("compileComponents", () => {
   it("Should throw Error if components is not object", () => {
@@ -84,22 +85,10 @@ describe("compileComponents", () => {
           f: {}
         })
       ).toEqual({
-        a: {
-          type: TYPES.String,
-          value: ""
-        },
-        b: {
-          type: TYPES.Null,
-          value: null
-        },
-        c: {
-          type: TYPES.Numeric,
-          value: 1
-        },
-        d: {
-          type: TYPES.Boolean,
-          value: true
-        },
+        a: createValue(""),
+        b: createValue(null),
+        c: createValue(1),
+        d: createValue(true),
         e: {
           type: TYPES.Raw,
           value: []
@@ -120,23 +109,14 @@ describe("compileComponents", () => {
           "#template#": "a+d"
         })
       ).toEqual({
-        twoWayBinding: {
-          type: TYPES.Identifier,
-          name: "a"
-        },
-        propertyBinding: {
-          type: TYPES.Identifier,
-          name: "b"
-        },
-        onEvent: {
-          type: TYPES.Identifier,
-          name: "c"
-        },
-        template: {
+        twoWayBinding: createProgram(createIdentifier("a")),
+        propertyBinding: createProgram(createIdentifier("b")),
+        onEvent: createProgram(createIdentifier("c")),
+        template: createProgram({
           type: "TemplateLiteral",
           expressions: [],
-          quasis: [{ type: "String", value: "a+d" }]
-        }
+          quasis: [createValue("a+d")]
+        })
       });
     });
   });

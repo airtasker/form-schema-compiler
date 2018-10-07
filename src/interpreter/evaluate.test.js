@@ -158,9 +158,21 @@ describe("interpreter evaluate()", () => {
 
   it("should support TemplateLiteral", () => {
     env.set("world", "world");
-    env.set("foo", () => 'bar');
-    expect(evaluateWithStringExpression("`hello {world}, {`foo`}{foo()}`", env)).toBe(
-      "hello world, foobar"
-    );
+    env.set("foo", () => "bar");
+    expect(
+      evaluateWithStringExpression("`hello {world}, {`foo`}{foo()}`", env)
+    ).toBe("hello world, foobar");
+  });
+
+  it("should support program", () => {
+    env.set("foobar", jest.fn());
+    env.set("hello", jest.fn());
+    expect(
+      evaluateWithStringExpression('foobar(); hello({"a":3}); 1+3', env)
+    ).toBe(4);
+    expect(env.get("foobar")).toHaveBeenCalled();
+    expect(env.get("hello")).toHaveBeenCalledWith({
+      a: 3
+    });
   });
 });

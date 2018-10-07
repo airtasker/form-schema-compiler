@@ -7,6 +7,7 @@ export const TYPES = {
   Null: "Null",
   RegExp: "RegExp",
   Identifier: "Identifier",
+  Keyword: 'Keyword',
   AssignExpression: "AssignExpression",
   ObjectExpression: "ObjectExpression",
   ObjectProperty: "ObjectProperty",
@@ -16,10 +17,13 @@ export const TYPES = {
   CallExpression: "CallExpression",
   TemplateLiteral: "TemplateLiteral",
   MemberExpression: "MemberExpression",
+  IfStatement: "IfStatement",
   Components: "Components",
   Operator: "Operator",
   Punctuation: "Punctuation",
-  Raw: "Raw"
+  Raw: "Raw",
+  Program: 'Program',
+  BlockStatement: 'BlockStatement',
 };
 
 /**
@@ -84,6 +88,12 @@ export const PRECEDENCE = {
 };
 
 export const BOOLEANS = ["false", "true"];
+export const IfKeywords = {
+  If: 'if',
+  Else: 'else',
+  Then: 'then'
+}
+export const KEYWORDS = [...BOOLEANS, ...Object.values(IfKeywords)];
 
 export const PUNCTUATIONS = {
   Braces: ["{", "}"],
@@ -91,7 +101,8 @@ export const PUNCTUATIONS = {
   Parentheses: ["(", ")"],
   Separator: ",",
   Colon: ":",
-  BackQuote: "`"
+  BackQuote: "`",
+  SemiColon: ";",
 };
 
 export const ANNOTATION_TYPES = {

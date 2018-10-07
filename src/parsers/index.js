@@ -29,15 +29,15 @@ export const parseExpressionString = parse;
  * @param expressionString
  */
 export const parseTwoWayBindingString = expressionString => {
-  const parsed = parse(expressionString);
-
-  if (parsed.type !== TYPES.Identifier) {
+  const ast = parse(expressionString);
+  const id = ast.body[0];
+  if (id && id.type !== TYPES.Identifier) {
     throw new Error(
       `data binding type have to be Identifier instead of ${
-        parsed.type
+        ast.type
       }(${expressionString})`
     );
   }
 
-  return parsed;
+  return ast;
 };

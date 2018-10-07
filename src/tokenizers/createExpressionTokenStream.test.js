@@ -32,6 +32,26 @@ describe("createExpressionTokenStream", () => {
     expect(stream.next()).toEqual(createValue(true));
   });
 
+  it("should recognize keyword", () => {
+    const stream = create("if then else");
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Keyword,
+      value: "if"
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Keyword,
+      value: "then"
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Keyword,
+      value: "else"
+    });
+    
+  });
+
   describe("should recognize number", () => {
     it("should recognize integer", () => {
       const stream = create("0 1 23456 7890");
@@ -116,7 +136,7 @@ describe("createExpressionTokenStream", () => {
   });
 
   it("should recognize punctuation", () => {
-    const stream = create("(){}[],:");
+    const stream = create("(){}[],:;");
 
     expect(stream.next()).toEqual({
       type: TYPES.Punctuation,
@@ -156,6 +176,11 @@ describe("createExpressionTokenStream", () => {
     expect(stream.next()).toEqual({
       type: TYPES.Punctuation,
       value: ":"
+    });
+
+    expect(stream.next()).toEqual({
+      type: TYPES.Punctuation,
+      value: ";"
     });
   });
 

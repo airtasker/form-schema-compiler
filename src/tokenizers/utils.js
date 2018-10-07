@@ -1,10 +1,11 @@
 import flatten from "lodash/flatten";
-import { BOOLEANS, OPERATORS, PUNCTUATIONS } from "../const";
+import { BOOLEANS, OPERATORS, KEYWORDS, PUNCTUATIONS } from "../const";
 
 export const isBoolean = str => BOOLEANS.includes(str);
 
 const operatorStrings = Object.values(OPERATORS);
 export const isOperatorString = str => operatorStrings.includes(str);
+export const isKeyword = str => KEYWORDS.includes(str);
 
 const operatorChars = [
   OPERATORS.Add,

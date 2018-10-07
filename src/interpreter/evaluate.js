@@ -1,5 +1,6 @@
 import { TYPES } from "../const";
 import evaluateIdentifier from "./evaluateIdentifier";
+import evaluateProgram from "./evaluateProgram";
 import evaluateUnaryExpression from "./evaluateUnaryExpression";
 import evaluateAssignExpression from "./evaluateAssignExpression";
 import evaluateBinaryExpression from "./evaluateBinaryExpression";
@@ -32,7 +33,9 @@ const TypeHandlers = {
   [TYPES.MemberExpression]: evaluateMemberObjectExpression,
   [TYPES.ObjectExpression]: evaluateObjectExpression,
   [TYPES.ArrayExpression]: evaluateArrayExpression,
-  [TYPES.TemplateLiteral]: evaluateTemplateLiteral
+  [TYPES.TemplateLiteral]: evaluateTemplateLiteral,
+  [TYPES.Program]: evaluateProgram,
+  [TYPES.BlockStatement]: evaluateProgram,
 };
 
 /**

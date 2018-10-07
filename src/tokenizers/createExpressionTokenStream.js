@@ -60,6 +60,12 @@ const createExpressionTokenStream = (
         value
       };
     }
+    if (utils.isKeyword(value)) {
+      return {
+        type: TYPES.Keyword,
+        value
+      };
+    }
     if (utils.isNull(value)) {
       // if identifier is  'null' then it's a null
       return {
