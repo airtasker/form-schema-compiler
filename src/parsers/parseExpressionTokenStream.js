@@ -1,6 +1,12 @@
 /* eslint-disable no-use-before-define */
 import flow from "lodash/flow";
-import { OPERATORS, PRECEDENCE, PUNCTUATIONS, TYPES } from "../const";
+import {
+  OPERATORS,
+  PRECEDENCE,
+  PUNCTUATIONS,
+  TYPES,
+  IF_KEYWORDS
+} from "../const";
 import * as utils from "./utils";
 
 /**
@@ -18,8 +24,8 @@ import * as utils from "./utils";
  * @param tokenStream
  */
 const parseExpressionTokenStream = tokenStream => {
+  const isKeyword = keyword => utils.isKeyword(tokenStream.peek(), keyword);
   const isPunctuation = paren => utils.isPunctuation(tokenStream.peek(), paren);
-
   const isOperator = operator => utils.isOperator(tokenStream.peek(), operator);
 
   const isUnary = () =>
@@ -43,6 +49,13 @@ const parseExpressionTokenStream = tokenStream => {
   const skipPunctuation = ch => {
     if (!isPunctuation(ch)) {
       tokenStream.croak(`Expecting punctuation: "${ch}"`);
+    }
+    tokenStream.next();
+  };
+
+  const skipKeyword = keyword => {
+    if (!isKeyword(keyword)) {
+      tokenStream.croak(`Expecting keyword: "${keyword}"`);
     }
     tokenStream.next();
   };
@@ -297,20 +310,52 @@ const parseExpressionTokenStream = tokenStream => {
     }
     return {
       type: TYPES.Program,
-      body,
-    }
+      body
+    };
   }
 
   function parseBlockStatement() {
     return {
       type: TYPES.BlockStatement,
-      callee,
-      arguments: delimited(
+      body: delimited(
         PUNCTUATIONS.Braces[0], // {
         PUNCTUATIONS.Braces[1], // }
         PUNCTUATIONS.SemiColon, // ;
         parseExpression
       )
+    };
+  }
+
+  function parseIfStatement() {
+    skipKeyword(IF_KEYWORDS.If);
+    const test = parseExpression();
+
+    let consequent = null;
+    let alternate = null;
+
+    if (isKeyword(IF_KEYWORDS.Then)) {
+      skipKeyword(IF_KEYWORDS.Then);
+      if (isPunctuation(PUNCTUATIONS.Braces[0])) {
+        consequent = parseBlockStatement();
+      } else {
+        consequent = parseExpression();
+      }
+    }
+
+    if (isKeyword(IF_KEYWORDS.Else)) {
+      skipKeyword(IF_KEYWORDS.Else);
+      if (isPunctuation(PUNCTUATIONS.Braces[0])) {
+        alternate = parseBlockStatement();
+      } else {
+        alternate = parseExpression();
+      }
+    }
+
+    return {
+      type: TYPES.IfStatement,
+      test,
+      consequent,
+      alternate
     };
   }
 
@@ -340,6 +385,10 @@ const parseExpressionTokenStream = tokenStream => {
     if (isPunctuation(PUNCTUATIONS.BackQuote)) {
       // if it reads back quote, then it's a Template Literal
       return parseTemplateLiteral();
+    }
+
+    if (isKeyword(IF_KEYWORDS.If)) {
+      return parseIfStatement();
     }
 
     const token = tokenStream.next();

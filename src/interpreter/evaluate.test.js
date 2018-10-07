@@ -175,4 +175,56 @@ describe("interpreter evaluate()", () => {
       a: 3
     });
   });
+
+  describe("if statement", () => {
+    it("should support if consequent", () => {
+      env.set("test", jest.fn().mockReturnValue(true));
+      env.set("consequent", jest.fn().mockReturnValue('foobar'));
+      env.set("alternate", jest.fn());
+      expect(
+        evaluateWithStringExpression('if test() then consequent() else alternate()', env)
+      ).toBe('foobar');
+      expect(env.get("test")).toHaveBeenCalled();
+      expect(env.get("consequent")).toHaveBeenCalled();
+      expect(env.get("alternate")).not.toHaveBeenCalled();
+    });
+
+    it("should support if alternate", () => {
+      env.set("test", jest.fn().mockReturnValue(false));
+      env.set("consequent", jest.fn());
+      env.set("alternate", jest.fn().mockReturnValue('foobar'));
+      expect(
+        evaluateWithStringExpression('if test() then consequent() else alternate()', env)
+      ).toBe('foobar');
+      expect(env.get("test")).toHaveBeenCalled();
+      expect(env.get("consequent")).not.toHaveBeenCalled();
+      expect(env.get("alternate")).toHaveBeenCalled();
+    });
+
+    it("should support chained if", () => {
+      env.set("test", jest.fn().mockReturnValue(false));
+      env.set("test2", jest.fn().mockReturnValue(false));
+      env.set("consequent", jest.fn());
+      env.set("alternate", jest.fn().mockReturnValue('foobar'));
+      expect(
+        evaluateWithStringExpression('if test() then consequent() else if test2() else alternate()', env)
+      ).toBe('foobar');
+      expect(env.get("test")).toHaveBeenCalled();
+      expect(env.get("test2")).toHaveBeenCalled();
+      expect(env.get("consequent")).not.toHaveBeenCalled();
+      expect(env.get("alternate")).toHaveBeenCalled();
+    });
+
+    it("should support if with blocks", () => {
+      env.set("test", jest.fn().mockReturnValue(true));
+      env.set("call1", jest.fn());
+      env.set("call2", jest.fn());
+      expect(
+        evaluateWithStringExpression('if test() then {call1(); call2();\n 123+110}', env)
+      ).toBe(233);
+      expect(env.get("test")).toHaveBeenCalled();
+      expect(env.get("call1")).toHaveBeenCalled();
+      expect(env.get("call2")).toHaveBeenCalled();
+    });
+  });
 });

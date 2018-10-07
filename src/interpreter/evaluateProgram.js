@@ -1,3 +1,4 @@
+// evaluate both block and program statement
 const evaluateProgram = ({ body }, env, evaluate) => {
   if (body.length === 0) {
     return null;

@@ -544,7 +544,7 @@ describe("parseExpressionTokenStream", () => {
   });
 
   it("should parse multiple expression", () => {
-    const ast = parse("foobar; hello(); 1*2");
+    const ast = parse("foobar; \nhello(); 1*2");
     expect(ast).toEqual(
       createProgram([
         createIdentifier("foobar"),
@@ -557,5 +557,114 @@ describe("parseExpressionTokenStream", () => {
         }
       ])
     );
+  });
+
+  describe("if statement", () => {
+    it("should parse if statement with only else", () => {
+      const ast = parse("if true and true else hello()");
+      expect(ast).toEqual(
+        createProgram({
+          type: TYPES.IfStatement,
+          test: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.And,
+            left: createValue(true),
+            right: createValue(true)
+          },
+          consequent: null,
+          alternate: createCallExpression(createIdentifier("hello"))
+        })
+      );
+    });
+
+    it("should parse if statement with only then", () => {
+      const ast = parse("if true and true then hello()");
+      expect(ast).toEqual(
+        createProgram({
+          type: TYPES.IfStatement,
+          test: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.And,
+            left: createValue(true),
+            right: createValue(true)
+          },
+          alternate: null,
+          consequent: createCallExpression(createIdentifier("hello"))
+        })
+      );
+    });
+
+    it("should parse simple if statement", () => {
+      const ast = parse("if true and true then 1+2 else hello()");
+      expect(ast).toEqual(
+        createProgram({
+          type: TYPES.IfStatement,
+          test: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.And,
+            left: createValue(true),
+            right: createValue(true)
+          },
+          consequent: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.Add,
+            left: createValue(1),
+            right: createValue(2)
+          },
+
+          alternate: createCallExpression(createIdentifier("hello"))
+        })
+      );
+    });
+
+    it("should parse if statement with blocks", () => {
+      const ast = parse(
+        "if true and true then {1+2;} else {hello(); hello2();}"
+      );
+      expect(ast).toEqual(
+        createProgram({
+          type: TYPES.IfStatement,
+          test: {
+            type: TYPES.BinaryExpression,
+            operator: OPERATORS.And,
+            left: createValue(true),
+            right: createValue(true)
+          },
+          consequent: createProgram(
+            {
+              type: TYPES.BinaryExpression,
+              operator: OPERATORS.Add,
+              left: createValue(1),
+              right: createValue(2)
+            },
+            false
+          ),
+          alternate: createProgram(
+            [
+              createCallExpression(createIdentifier("hello")),
+              createCallExpression(createIdentifier("hello2"))
+            ],
+            false
+          )
+        })
+      );
+    });
+
+    it("should parse chained if statements ", () => {
+      const ast = parse("if true then 1 else if false then {2}");
+      expect(ast).toEqual(
+        createProgram({
+          type: TYPES.IfStatement,
+          test: createValue(true),
+          consequent: createValue(1),
+          alternate: {
+            type: TYPES.IfStatement,
+            test: createValue(false),
+            consequent: createProgram(createValue(2), false),
+            alternate: null
+          }
+        })
+      );
+    });
   });
 });

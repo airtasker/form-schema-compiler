@@ -1,4 +1,4 @@
-import { TYPES } from '../const';
+import { TYPES } from "../const";
 
 const returnTokenWhen = (token, type, propKey, propValue) => {
   if (
@@ -12,7 +12,10 @@ const returnTokenWhen = (token, type, propKey, propValue) => {
 };
 
 export const isPunctuation = (token, paren = undefined) =>
-  returnTokenWhen(token, TYPES.Punctuation, 'value', paren);
+  returnTokenWhen(token, TYPES.Punctuation, "value", paren);
 
 export const isOperator = (token, operator = undefined) =>
-  returnTokenWhen(token, TYPES.Operator, 'value', operator);
+  returnTokenWhen(token, TYPES.Operator, "value", operator);
+
+export const isKeyword = (token, keyword = undefined) =>
+  returnTokenWhen(token, TYPES.Keyword, "value", keyword);

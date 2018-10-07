@@ -88,12 +88,12 @@ export const PRECEDENCE = {
 };
 
 export const BOOLEANS = ["false", "true"];
-export const IfKeywords = {
+export const IF_KEYWORDS = {
   If: 'if',
   Else: 'else',
   Then: 'then'
 }
-export const KEYWORDS = [...BOOLEANS, ...Object.values(IfKeywords)];
+export const KEYWORDS = [...BOOLEANS, ...Object.values(IF_KEYWORDS)];
 
 export const PUNCTUATIONS = {
   Braces: ["{", "}"],
@@ -122,4 +122,4 @@ export const ANNOTATIONS = {
 };
 
 // [minimum version, maximum version]
-export const COMPATIBLE_SCHEMA_VERSION = ["0.0.16", "0.0.17"];
+export const COMPATIBLE_SCHEMA_VERSION = ["0.0.17", "0.0.17"];

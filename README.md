@@ -52,6 +52,7 @@ export const TYPES = {
   Null: "Null",
   RegExp: "RegExp",
   Identifier: "Identifier",
+  Keyword: 'Keyword',
   AssignExpression: "AssignExpression",
   ObjectExpression: "ObjectExpression",
   ObjectProperty: "ObjectProperty",
@@ -59,12 +60,17 @@ export const TYPES = {
   BinaryExpression: "BinaryExpression",
   UnaryExpression: "UnaryExpression",
   CallExpression: "CallExpression",
+  TemplateLiteral: "TemplateLiteral",
   MemberExpression: "MemberExpression",
+  IfStatement: "IfStatement",
   Components: "Components",
   Operator: "Operator",
   Punctuation: "Punctuation",
-  Raw: "Raw"
+  Raw: "Raw",
+  Program: 'Program',
+  BlockStatement: 'BlockStatement',
 };
+
 
 export const PRIMITIVES = [
   TYPES.Numeric,
@@ -81,8 +87,10 @@ export const EXPRESSIONS = [
   TYPES.BinaryExpression,
   TYPES.AssignExpression,
   TYPES.CallExpression,
-  TYPES.UnaryExpression
+  TYPES.UnaryExpression,
+  TYPES.TemplateLiteral,
 ];
+
 
 export const OPERATORS = {
   Assign: "=",
@@ -104,6 +112,7 @@ export const OPERATORS = {
 };
 
 export const PRECEDENCE = {
+  [OPERATORS.Assign]: 1,
   [OPERATORS.Or]: 2,
   [OPERATORS.And]: 3,
   [OPERATORS.GreaterThan]: 7,
@@ -121,13 +130,21 @@ export const PRECEDENCE = {
 };
 
 export const BOOLEANS = ["false", "true"];
+export const IF_KEYWORDS = {
+  If: 'if',
+  Else: 'else',
+  Then: 'then'
+}
+export const KEYWORDS = [...BOOLEANS, ...Object.values(IF_KEYWORDS)];
 
 export const PUNCTUATIONS = {
   Braces: ["{", "}"],
   SquareBrackets: ["[", "]"],
   Parentheses: ["(", ")"],
   Separator: ",",
-  Colon: ":"
+  Colon: ":",
+  BackQuote: "`",
+  SemiColon: ";",
 };
 
 export const ANNOTATION_TYPES = {
@@ -145,9 +162,6 @@ export const ANNOTATIONS = {
   [ANNOTATION_TYPES.EventBinding]: ["(", ")"],
   [ANNOTATION_TYPES.TwoWayBinding]: ["[", "]"]
 };
-
-// [minimum version, maximum version]
-export const COMPATIBLE_SCHEMA_VERSION = ["0.0.16", "0.0.17"];
 
 ```
 

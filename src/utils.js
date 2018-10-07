@@ -65,6 +65,6 @@ export const createIdentifier = name => ({
 });
 
 export const createProgram = (body, isProgram = true) => ({
-  type: isProgram ? TYPES.Program : TYPEs.BlockStatement,
+  type: isProgram ? TYPES.Program : TYPES.BlockStatement,
   body: Array.isArray(body) ? body : [body]
 });
