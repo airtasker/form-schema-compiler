@@ -108,7 +108,7 @@ export const PUNCTUATIONS = {
 export const ANNOTATION_TYPES = {
   PropertyBinding: "PropertyBinding",
   Template: "Template",
-  Component: "Component",
+  Components: "Components",
   EventBinding: "EventBinding",
   TwoWayBinding: "TwoWayBinding"
 };
@@ -116,7 +116,7 @@ export const ANNOTATION_TYPES = {
 export const ANNOTATIONS = {
   [ANNOTATION_TYPES.PropertyBinding]: ["{", "}"],
   [ANNOTATION_TYPES.Template]: ["#", "#"],
-  [ANNOTATION_TYPES.Component]: ["<", ">"],
+  [ANNOTATION_TYPES.Components]: ["<", ">"],
   [ANNOTATION_TYPES.EventBinding]: ["(", ")"],
   [ANNOTATION_TYPES.TwoWayBinding]: ["[", "]"]
 };

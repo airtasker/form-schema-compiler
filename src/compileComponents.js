@@ -75,7 +75,7 @@ const toValueObject = value => {
  * '(value)' return '()'
  */
 const getAnnotationType = key =>
-  findKey(ANNOTATIONS, { 0: key[0], 1: key[key.length - 1] });
+  findKey(ANNOTATIONS, { 0: key[0], 1: key.substr(-1) });
 
 /**
  * strip annotation
@@ -94,7 +94,7 @@ const stripAnnotation = (value, key) => {
     case ANNOTATION_TYPES.TwoWayBinding:
     case ANNOTATION_TYPES.PropertyBinding:
     case ANNOTATION_TYPES.Template:
-    case ANNOTATION_TYPES.Component:
+    case ANNOTATION_TYPES.Components:
       // only strip annotation when there is one
       // convert [value] to value
       return strippedKey;
@@ -116,15 +116,33 @@ const stripAnnotation = (value, key) => {
 const compileValue = curry((options, value, key) => {
   switch (getAnnotationType(key)) {
     case ANNOTATION_TYPES.EventBinding:
-      return parseExpressionString(value);
+      return {
+        type: ANNOTATION_TYPES.EventBinding,
+        value: parseExpressionString(value)
+      };
     case ANNOTATION_TYPES.PropertyBinding:
-      // todo support object
-      return parseExpressionString(value);
+      if (typeof value === "object") {
+        return {
+          type: ANNOTATION_TYPES.PropertyBinding,
+          nested: true,
+          value: compileProps(value, options)
+        };
+      }
+      return {
+        type: ANNOTATION_TYPES.PropertyBinding,
+        nested: false,
+        value: parseExpressionString(value)
+      };
     case ANNOTATION_TYPES.TwoWayBinding:
-      return parseTwoWayBindingString(value);
+      throw new Error(
+        "Should use compile to convert TwoWayBinding to EventBinding and PropertyBinding"
+      );
     case ANNOTATION_TYPES.Template:
-      return parseTemplateString(value);
-    case ANNOTATION_TYPES.Component:
+      return {
+        type: ANNOTATION_TYPES.PropertyBinding,
+        value: parseTemplateString(value)
+      };
+    case ANNOTATION_TYPES.Components:
       // recursively compile nested component
       // eslint-disable-next-line no-use-before-define
       return compileComponents(value, options);

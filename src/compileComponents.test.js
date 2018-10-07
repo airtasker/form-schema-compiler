@@ -1,5 +1,5 @@
 import { compileComponents, compileProps } from "./compileComponents";
-import { TYPES } from "./const";
+import { TYPES, ANNOTATION_TYPES } from "./const";
 import { createValue, createIdentifier, createProgram } from "./utils";
 
 describe("compileComponents", () => {
@@ -103,21 +103,70 @@ describe("compileComponents", () => {
     it("Should compile expression props", () => {
       expect(
         compileProps({
-          "[twoWayBinding]": "a",
           "{propertyBinding}": "b",
+          "{nestedObject}": {
+            "{nestedProp}": {
+              "{nestedNestedProp}": "n"
+            },
+            "<nestedComponent>": {
+              type: "Component"
+            }
+          },
           "(event)": "c",
           "#template#": "a+d"
         })
       ).toEqual({
-        twoWayBinding: createProgram(createIdentifier("a")),
-        propertyBinding: createProgram(createIdentifier("b")),
-        onEvent: createProgram(createIdentifier("c")),
-        template: createProgram({
-          type: "TemplateLiteral",
-          expressions: [],
-          quasis: [createValue("a+d")]
-        })
+        propertyBinding: {
+          type: ANNOTATION_TYPES.PropertyBinding,
+          value: createProgram(createIdentifier("b")),
+          nested: false
+        },
+        nestedObject: {
+          type: ANNOTATION_TYPES.PropertyBinding,
+          nested: true,
+          value: {
+            nestedProp: {
+              type: ANNOTATION_TYPES.PropertyBinding,
+              nested: true,
+              value: {
+                nestedNestedProp: {
+                  type: ANNOTATION_TYPES.PropertyBinding,
+                  value: createProgram(createIdentifier("n")),
+                  nested: false
+                }
+              }
+            },
+            nestedComponent: {
+              type: TYPES.Components,
+              components: [
+                {
+                  type: "Component"
+                }
+              ]
+            }
+          }
+        },
+        onEvent: {
+          type: ANNOTATION_TYPES.EventBinding,
+          value: createProgram(createIdentifier("c"))
+        },
+        template: {
+          type: ANNOTATION_TYPES.PropertyBinding,
+          value: createProgram({
+            type: "TemplateLiteral",
+            expressions: [],
+            quasis: [createValue("a+d")]
+          })
+        }
       });
+    });
+
+    it("Should throw if there is TwoWayBinding", () => {
+      expect(() =>
+        compileProps({
+          "[twoWayBinding]": "b"
+        })
+      ).toThrow();
     });
   });
 });
