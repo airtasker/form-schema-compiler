@@ -1,7 +1,5 @@
 export default class Environment {
-    constructor(parent) {
-        this.vars = Object.create(null);
-    }
+    vars = Object.create(null);
 
     get(name) {
         if (name in this.vars) {
