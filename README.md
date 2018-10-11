@@ -69,8 +69,9 @@ export const TYPES = {
   Raw: "Raw",
   Program: 'Program',
   BlockStatement: 'BlockStatement',
+  PropertyBinding: 'PropertyBinding',
+  EventBinding: 'EventBinding',
 };
-
 
 export const PRIMITIVES = [
   TYPES.Numeric,
@@ -90,7 +91,6 @@ export const EXPRESSIONS = [
   TYPES.UnaryExpression,
   TYPES.TemplateLiteral,
 ];
-
 
 export const OPERATORS = {
   Assign: "=",
@@ -148,20 +148,21 @@ export const PUNCTUATIONS = {
 };
 
 export const ANNOTATION_TYPES = {
-  PropertyBinding: "PropertyBinding",
+  [TYPES.PropertyBinding]: TYPES.PropertyBinding,
+  [TYPES.EventBinding]: TYPES.EventBinding,
   Template: "Template",
-  Component: "Component",
-  EventBinding: "EventBinding",
+  Components: "Components",
   TwoWayBinding: "TwoWayBinding"
 };
 
 export const ANNOTATIONS = {
   [ANNOTATION_TYPES.PropertyBinding]: ["{", "}"],
   [ANNOTATION_TYPES.Template]: ["#", "#"],
-  [ANNOTATION_TYPES.Component]: ["<", ">"],
+  [ANNOTATION_TYPES.Components]: ["<", ">"],
   [ANNOTATION_TYPES.EventBinding]: ["(", ")"],
   [ANNOTATION_TYPES.TwoWayBinding]: ["[", "]"]
 };
+
 
 ```
 
