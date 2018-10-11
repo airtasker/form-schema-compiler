@@ -9,9 +9,11 @@ import evaluateMemberObjectExpression from "./evaluateMemberObjectExpression";
 import evaluateObjectExpression from "./evaluateObjectExpression";
 import evaluateArrayExpression from "./evaluateArrayExpression";
 import evaluateTemplateLiteral from "./evaluateTemplateLiteral";
+import evaluateIfStatement from "./evaluateIfStatement";
+import evaluateEventBindingExpression from "./evaluateEventBindingExpression";
+import evaluatePropertyBindingExpression from "./evaluatePropertyBindingExpression";
 import { hasKey } from "../utils";
 import Environment from "./Environment";
-import evaluateIfStatement from "./evaluateIfStatement";
 
 const getValue = ({ value }) => value;
 const toRegExp = ({ pattern, flags }) => new RegExp(pattern, flags);
@@ -37,7 +39,9 @@ const TypeHandlers = {
   [TYPES.TemplateLiteral]: evaluateTemplateLiteral,
   [TYPES.Program]: evaluateProgram,
   [TYPES.BlockStatement]: evaluateProgram,
-  [TYPES.IfStatement]: evaluateIfStatement
+  [TYPES.IfStatement]: evaluateIfStatement,
+  [TYPES.EventBinding]: evaluateEventBindingExpression,
+  [TYPES.PropertyBinding]: evaluatePropertyBindingExpression,
 };
 
 /**

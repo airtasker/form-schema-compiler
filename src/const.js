@@ -24,6 +24,8 @@ export const TYPES = {
   Raw: "Raw",
   Program: 'Program',
   BlockStatement: 'BlockStatement',
+  PropertyBinding: 'PropertyBinding',
+  EventBinding: 'EventBinding',
 };
 
 /**
@@ -106,10 +108,10 @@ export const PUNCTUATIONS = {
 };
 
 export const ANNOTATION_TYPES = {
-  PropertyBinding: "PropertyBinding",
+  [TYPES.PropertyBinding]: TYPES.PropertyBinding,
+  [TYPES.EventBinding]: TYPES.EventBinding,
   Template: "Template",
   Components: "Components",
-  EventBinding: "EventBinding",
   TwoWayBinding: "TwoWayBinding"
 };
 

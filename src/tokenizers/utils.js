@@ -79,7 +79,7 @@ export const readEscaped = (inputStream, shouldStop) => {
     inputStream.next();
   }
   
-  inputStream.croak('input stream ended with no close string');
+  inputStream.croak('input stream ended with no close symbol');
 };
 
 /**

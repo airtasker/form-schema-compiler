@@ -48,14 +48,14 @@ const parseExpressionTokenStream = tokenStream => {
    */
   const skipPunctuation = ch => {
     if (!isPunctuation(ch)) {
-      tokenStream.croak(`Expecting punctuation: "${ch}"`);
+      tokenStream.croak(`Unexpected token: "${JSON.stringify(tokenStream.peek())}, "Expecting punctuation: "${ch}"`);
     }
     tokenStream.next();
   };
 
   const skipKeyword = keyword => {
     if (!isKeyword(keyword)) {
-      tokenStream.croak(`Expecting keyword: "${keyword}"`);
+      tokenStream.croak(`Unexpected token: "${JSON.stringify(tokenStream.peek())}, Expecting keyword: "${keyword}"`);
     }
     tokenStream.next();
   };

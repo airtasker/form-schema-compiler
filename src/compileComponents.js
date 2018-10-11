@@ -106,6 +106,22 @@ const stripAnnotation = (value, key) => {
   }
 };
 
+class ErrorPathTrace extends Error {
+  constructor(key, value, error) {
+    super();
+    if (error.kind === 'ErrorPathTrace') {
+      this.path = `${key}.${error.path}`;
+      this.originMessage = error.originMessage;
+    } else {
+      this.path = `${key}:"${value}"`;
+      this.originMessage = error.message;
+    }
+    this.kind = 'ErrorPathTrace';
+    this.message = `Found an error in   ${this.path}.   Error details: ${this.originMessage}`;
+    
+  }
+}
+
 /**
  * compile value to ast expression,
  * examples see expression parsers and tests
@@ -114,40 +130,44 @@ const stripAnnotation = (value, key) => {
  * @param {*} key
  */
 const compileValue = curry((options, value, key) => {
-  switch (getAnnotationType(key)) {
-    case ANNOTATION_TYPES.EventBinding:
-      return {
-        type: ANNOTATION_TYPES.EventBinding,
-        value: parseExpressionString(value)
-      };
-    case ANNOTATION_TYPES.PropertyBinding:
-      if (typeof value === "object") {
+  try {
+    switch (getAnnotationType(key)) {
+      case ANNOTATION_TYPES.EventBinding:
+        return {
+          type: ANNOTATION_TYPES.EventBinding,
+          value: parseExpressionString(value)
+        };
+      case ANNOTATION_TYPES.PropertyBinding:
+        if (typeof value === "object") {
+          return {
+            type: ANNOTATION_TYPES.PropertyBinding,
+            nested: true,
+            value: compileProps(value, options)
+          };
+        }
         return {
           type: ANNOTATION_TYPES.PropertyBinding,
-          nested: true,
-          value: compileProps(value, options)
+          nested: false,
+          value: parseExpressionString(value)
         };
-      }
-      return {
-        type: ANNOTATION_TYPES.PropertyBinding,
-        nested: false,
-        value: parseExpressionString(value)
-      };
-    case ANNOTATION_TYPES.TwoWayBinding:
-      throw new Error(
-        "Should use compile to convert TwoWayBinding to EventBinding and PropertyBinding"
-      );
-    case ANNOTATION_TYPES.Template:
-      return {
-        type: ANNOTATION_TYPES.PropertyBinding,
-        value: parseTemplateString(value)
-      };
-    case ANNOTATION_TYPES.Components:
-      // recursively compile nested component
-      // eslint-disable-next-line no-use-before-define
-      return compileComponents(value, options);
-    default:
-      return toValueObject(value);
+      case ANNOTATION_TYPES.TwoWayBinding:
+        throw new Error(
+          "Should use compile to convert TwoWayBinding to EventBinding and PropertyBinding"
+        );
+      case ANNOTATION_TYPES.Template:
+        return {
+          type: ANNOTATION_TYPES.PropertyBinding,
+          value: parseTemplateString(value)
+        };
+      case ANNOTATION_TYPES.Components:
+        // recursively compile nested component
+        // eslint-disable-next-line no-use-before-define
+        return compileComponents(value, options);
+      default:
+        return toValueObject(value);
+    }
+  } catch (error) {
+    throw new ErrorPathTrace(key, value, error);
   }
 });
 
