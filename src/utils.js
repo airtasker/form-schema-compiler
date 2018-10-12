@@ -3,7 +3,8 @@ import { TYPES, COMPATIBLE_SCHEMA_VERSION } from "./const";
 export const hasKey = (obj, key) =>
   Object.prototype.hasOwnProperty.call(obj, key);
 
-const semvarToArray = version => version.split(".").map(Number);
+const semvarToArray = version => version.split(".");
+const normalizeVersion = versions => versions.map(version => version.padStart(4, '0')).join('');
 
 export const isVersionCompatible = version => {
   const versions = semvarToArray(version);
@@ -12,8 +13,11 @@ export const isVersionCompatible = version => {
   }
 
   const [min, max] = COMPATIBLE_SCHEMA_VERSION.map(semvarToArray);
+  const versionStr = normalizeVersion(versions);
+  const minStr = normalizeVersion(min);
+  const maxStr = normalizeVersion(max);
 
-  return versions.every((v, i) => v >= min[i] && v <= max[i]);
+  return versionStr >= minStr && versionStr <= maxStr;
 };
 
 export const createCallExpression = (callee, ...args) => ({
