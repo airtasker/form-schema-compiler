@@ -274,6 +274,24 @@ describe("createExpressionTokenStream", () => {
       expect(stream.eof()).toBeTruthy();
     });
 
+    it("should support spacing line-break in template literal", () => {
+      const stream = create("`\n  \r  \t`");
+
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.String,
+        value: "\n  \r  \t"
+      });
+      expect(stream.next()).toEqual({
+        type: TYPES.Punctuation,
+        value: "`"
+      });
+      expect(stream.eof()).toBeTruthy();
+    });
+
     it("should support complex template literal", () => {
       const stream = create("`'\"foo\"'\\{\\`{`1{1}`}bar`");
       expect(stream.next()).toEqual({

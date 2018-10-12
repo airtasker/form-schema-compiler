@@ -224,12 +224,14 @@ const createExpressionTokenStream = (
 
   // eslint-disable-next-line consistent-return
   function readNext() {
-    utils.readWhile(inputStream, utils.isWhitespace);
-
-    const ch = inputStream.peek();
     if (isStringTemplateMode) {
       return readTemplateLiteral();
     }
+    
+    // skip the white space if it is not in template literal
+    utils.readWhile(inputStream, utils.isWhitespace);
+
+    const ch = inputStream.peek();
 
     if (shouldEnd(inputStream, ch)) {
       return null;
