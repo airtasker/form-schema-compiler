@@ -1,6 +1,14 @@
 {
-  "presets": [["es2015", { "modules": false }], "stage-2"],
-  "plugins": ["transform-decorators-legacy"],
+  "presets": [["@babel/preset-env", { "modules": false }]],
+  "plugins": [
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    ["@babel/plugin-proposal-class-properties"]
+  ],
   "env": {
     "commonjs": {
       "plugins": [["transform-es2015-modules-commonjs", { "loose": true }]]
@@ -9,7 +17,7 @@
       "plugins": ["external-helpers"]
     },
     "test": {
-      "presets": ["es2015", "stage-2"]
+      "presets": ["@babel/preset-env"]
     }
   }
 }
